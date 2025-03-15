@@ -11,13 +11,28 @@ This project analyzes and models housing prices in Pittsburgh, with a focus on i
 4. **Model Diagnostics**: Check for assumptions like multicollinearity, heteroskedasticity, and influential points.
 5. **Final Analysis**: Identify the most and least expensive neighborhoods using adjusted means and visualize trends over time.
 
-## Data Cleaning & Preprocessing
+
+### Data Source
+
+The data used in this project was obtained from Allegheny County.
+
+### Data Cleaning & Preprocessing
 
 - **Missing Values**: Approximately 20% of the 90,000 observations had missing data. After inspection, these missing values were determined to be random, so they were dropped. We retained enough remaining observations for meaningful analysis.
 
 - **Sale Descriptions**: The sale descriptions labeled as "love and affection" were removed because they were associated with very low sale prices that did not reflect accurate market values. Upon inspection, the rate of these sales was stable across ZIP codes, so they were deemed to distort the overall analysis. 
 
 - **Other Sale Descriptions**: Other sale descriptions, such as bank repossessions, could lead to lower sale prices. However, these are not equally distributed across ZIP codes and show an underlying pattern in the data. Since they provide valuable insights into the market, these observations were retained in the dataset.
+
+### Data Transformation
+
+- **Extracting Sale Year**: The sale year was extracted from the `SALEDATE.x` column, which contains the full date. This year is then converted into a factor for use in analysis.
+
+- **Encoding Ratings**: The `GRADEDESC` column, which represents neighborhood ratings, was transformed into an ordered factor. This transformation ensures that the neighborhood ratings are treated as ordinal data in the statistical models. The ratings are ordered from "POOR" to "Highest Cost."
+
+### Cleaned Data Availability
+
+The cleaned data is available for download in this repository. You can find the file under the "data" folder or in the relevant section of this project.
 
 ## Libraries Used
 
