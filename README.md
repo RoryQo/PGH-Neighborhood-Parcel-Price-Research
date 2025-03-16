@@ -264,7 +264,7 @@ Finally, **adjusted means** for the housing prices across ZIP codes are calculat
 
 
 
-## Viewing Adjuested Mean Trends Through Time
+## Viewing Adjusted Mean Trends Through Time
 
 ###
 <p align="center">
