@@ -102,8 +102,16 @@ A series of linear regression models are constructed to predict housing prices b
 #### a. Full Model (Max Model)
 The **max model** includes all potential predictors of house price, such as `LOTAREA`, `STYLE`, `YEARBLT`, `GRADEDESC`, `CONDITION`, and more.
 
+```math
+\text{PRICE} = \beta_0 + \beta_1 \cdot \text{LOTAREA} + \beta_2 \cdot \text{STYLE} + \beta_3 \cdot \text{STORIES} + \beta_4 \cdot \text{YEARBLT} + \beta_5 \cdot \text{EXTERIORFINISH} + \beta_6 \cdot \text{BASEMENT} + \beta_7 \cdot \text{GRADEDESC} + \beta_8 \cdot \text{CONDITION} + \beta_9 \cdot \text{TOTALROOMS} + \beta_{10} \cdot \text{BEDROOMS} + \beta_{11} \cdot \text{FULLBATHS} + \beta_{12} \cdot \text{HALFBATHS} + \beta_{13} \cdot \text{HEATINGCOOLING} + \beta_{14} \cdot \text{FIREPLACES} + \beta_{15} \cdot \text{BSMTGARAGE} + \beta_{16} \cdot \text{FINISHEDLIVINGAREA} + \beta_{17} \cdot \text{SALEYEAR} + \beta_{18} \cdot \text{SALEDESC.x} + \beta_{19} \cdot \text{CONDITION} + \epsilon
+```
+
 #### b. Null Model (Min Model)
 The **null model** includes only an intercept, essentially predicting the mean price without any independent variables.
+
+```math
+\text{PRICE} = \beta_0 + \epsilon
+```
 
 #### c. Stepwise Model Selection
 The **best model** is selected using a stepwise selection process. This function selects the best predictors based on AIC (Akaike Information Criterion), which balances model fit and complexity.
@@ -113,14 +121,21 @@ The **best model** is selected using a stepwise selection process. This function
 - **Influential Points**: Cook's Distance is used to identify and remove highly influential points that might distort the model’s estimates.
 - **Heteroskedasticity**: The Breusch-Pagan test is used to detect heteroskedasticity (non-constant variance of residuals). If detected, robust standard errors are applied to correct for this issue.
 
-### 4. Weighted Least Squares (WLS)
-When heteroskedasticity is present, **Weighted Least Squares (WLS)** regression is used, where the weights are inversely proportional to the fitted values from the initial model.
+### 4. Log Transformation
+
+```math
+\text{PRICE} = \beta_0 + \beta_1 \cdot \text{GRADEDESC} + \beta_2 \cdot \log(\text{FINISHEDLIVINGAREA} + 0.01) + \beta_3 \cdot \text{SALEDESC.x} + \beta_4 \cdot \text{HEATINGCOOLING} + \beta_5 \cdot \text{STYLE} + \beta_6 \cdot \text{FULLBATHS} + \beta_7 \cdot \log(\text{LOTAREA} + 0.01) + \beta_8 \cdot \text{HALFBATHS} + \beta_9 \cdot \text{CONDITION} + \beta_{10} \cdot \text{FIREPLACES} + \beta_{11} \cdot \log(\text{TOTALROOMS} + 0.01) + \beta_{12} \cdot \text{EXTERIORFINISH} + \beta_{13} \cdot (\text{SALEYEAR} - \text{YEARBLT}) + \beta_{14} \cdot \text{BEDROOMS} + \beta_{15} \cdot \text{STORIES} + \epsilon
+```
 
 ### 5. Box-Cox Transformation
-The **Box-Cox transformation** is applied to the dependent variable (`PRICE`) to identify an optimal transformation (lambda) that improves the model’s normality.
+The **Box-Cox transformation** is applied to the dependent variable (`PRICE`) to identify an optimal transformation (lambda) that improves the model’s normality. Weighted least squares was also attempted but performed worse, so it is omitted here, and continued by performing a Box-Cox test.
 
 ### 6. Analysis of Covariance (ANCOVA)
 ANCOVA is performed to compare the mean prices of homes across different ZIP codes, adjusting for other variables in the model.
+
+```math
+\text{PRICE} = \beta_0 + \beta_1 \cdot \text{PROPERTYZIP.x} + \beta_2 \cdot \text{GRADEDESC} + \beta_3 \cdot \text{TOTALROOMS} + \beta_4 \cdot \text{FINISHEDLIVINGAREA} + \beta_5 \cdot \text{SALEDESC.x} + \epsilon
+```
 
 ### 7. Adjusted Means
 Finally, **adjusted means** for the housing prices across ZIP codes are calculated, accounting for nuisance variables like `GRADEDESC`, `SALEDESC.x`, and `HEATINGCOOLING`. These adjusted means are visualized to identify which ZIP codes are the most and least expensive.
