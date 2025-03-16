@@ -2,21 +2,32 @@
 
 ## Overview
 
-This project analyzes and models housing prices in Pittsburgh, with a focus on identifying the most and least expensive neighborhoods based on various factors such as property characteristics, neighborhood grades, and the year of sale. The project uses statistical models like linear regression and weighted least squares, as well as diagnostics to explore housing price trends across Pittsburgh's ZIP codes.
-
-### Key Objectives:
-1. **Data Preprocessing**: Clean and prepare the housing data for analysis.
-2. **Exploratory Data Analysis (EDA)**: Explore housing price distributions, examine relationships between variables, and visualize key insights.
-3. **Statistical Modeling**: Build regression models to predict housing prices based on different features, and evaluate model performance.
-4. **Model Diagnostics**: Check for assumptions like multicollinearity, heteroskedasticity, and influential points.
-5. **Final Analysis**: Identify the most and least expensive neighborhoods using adjusted means and visualize trends over time.
+This project explores housing prices in Pittsburgh, with a focus on identifying factors that influence property values, such as property characteristics, neighborhood ratings, and sale year. We use a range of statistical techniques, including linear regression, weighted least squares (WLS), ANOVA, and ANCOVA, to understand trends and relationships in housing prices across different neighborhoods.
 
 
-### Data Source
+## Data
 
-The data used in this project was obtained from Allegheny County.
+The data used in this project is sourced from **Allegheny County**, and we also use additional data from the **Western Pennsylvania Regional Data Center (WPRDC)** for real estate sales and property assessments.
+
+### Transaction Data Set (2013 to Present)  
+
+[![View Original Research Paper](https://img.shields.io/badge/Real%20Estate%20Sales%20Data-0056A0?style=flat&logo=external-link&logoColor=white&color=0056A0)](https://www.aeaweb.org/articles?id=10.1257/app.3.3.1)  
+
+This dataset provides **transactional data** from 2013 to the present. It includes sales prices, sale dates, and property identification numbers (PINs), but **does not contain property characteristics** (such as house size, condition, etc.).  
+**Note**: The primary key is **PARID**, which is equivalent to **PIN** (Property Identification Number).
+
+### Assessor Records (Property Assessments)  
+
+
+
+[![View Original Research Paper](https://img.shields.io/badge/Assessor%20Records%20Data-0056A0?style=flat&logo=external-link&logoColor=white&color=0056A0)](https://data.wprdc.org/dataset/property-assessments)
+
+This dataset includes **property characteristics** such as square footage, number of rooms, property condition, and assessment values. It provides detailed information about the physical attributes of properties, which is essential for modeling house prices.  
+**Note**: The primary key is **PARID**, which corresponds to the **PIN** (Property Identification Number), ensuring that it can be matched with transactional data.
 
 ### Data Cleaning & Preprocessing
+
+- **Merge**: Merge both data sets together horizontally on the key of zipcodes, then remove identical columns from the merge
 
 - **Missing Values**: Approximately 20% of the 90,000 observations had missing data. After inspection, these missing values were determined to be random, so they were dropped. We retained enough remaining observations for meaningful analysis.
 
@@ -33,40 +44,6 @@ The data used in this project was obtained from Allegheny County.
 ### Cleaned Data Availability
 
 The cleaned data is available for download in this repository. You can find the file under the "data" folder or in the relevant section of this project.
-
-## Libraries Used
-
-This project leverages the following R libraries:
-
-- **tidyverse**: For data manipulation and visualization.
-- **car**: For regression diagnostics and VIF (Variance Inflation Factor).
-- **ggplot2**: For creating visualizations.
-- **MASS**: For statistical modeling functions.
-- **readxl**: For reading Excel files (if needed).
-- **softImpute**: For matrix factorization techniques (if any missing values).
-- **stargazer**: For presenting summary statistics and regression results.
-- **gridExtra**: For arranging multiple plots in a grid.
-
-## Data
-
-The dataset used in this project (`pgh_dropped.csv`) contains housing data for Pittsburgh. The key columns include:
-
-- **PRICE**: The sale price of the house.
-- **PROPERTYZIP.x**: The ZIP code of the property.
-- **GRADEDESC**: The neighborhood rating (e.g., "EXCELLENT," "AVERAGE").
-- **YEARBLT**: The year the house was built.
-- **SALEYEAR**: The year the house was sold.
-- **FINISHEDLIVINGAREA**: The finished living area of the house.
-- **LOTAREA**: The lot size.
-- **FULLBATHS**: The number of full bathrooms.
-- **HALFBATHS**: The number of half bathrooms.
-- **STORIES**: The number of stories in the house.
-- **CONDITION**: The condition of the house (e.g., "EXCELLENT," "GOOD").
-
-### Data Cleaning & Preprocessing
-- **Missing Values**: Rows with missing values in important columns like `GRADEDESC` are removed.
-- **Factor Conversion**: The `GRADEDESC` column (neighborhood grade) is converted into an ordered factor for statistical analysis.
-- **Log Transformation**: Some continuous variables like `PRICE`, `LOTAREA`, and `FINISHEDLIVINGAREA` are log-transformed to stabilize variance and make the distribution more normal.
 
 ## Statistical Models and Analysis
 
@@ -229,23 +206,9 @@ ANCOVA is performed to compare the mean prices of homes across different ZIP cod
 
 | Variable                           | Df   | Sum Sq | Mean Sq | F value   | Pr(>F)    |
 |------------------------------------|------|--------|---------|-----------|-----------|
-| GRADEDESC                          | 1    | 38174  | 38174   | 28996.014 | < 2e-16   |
-| log(FINISHEDLIVINGAREA + 0.01)     | 1    | 3431   | 3431    | 2606.093  | < 2e-16   |
-| SALEDESC.x                         | 25   | 78242  | 3130    | 2377.263  | < 2e-16   |
-| HEATINGCOOLING                     | 14   | 7635   | 545     | 414.258   | < 2e-16   |
-| STYLE                              | 23   | 4857   | 211     | 160.420   | < 2e-16   |
-| FULLBATHS                          | 7    | 897    | 128     | 97.320    | < 2e-16   |
-| log(LOTAREA + 0.01)                | 1    | 931    | 931     | 707.322   | < 2e-16   |
-| HALFBATHS                          | 6    | 829    | 138     | 105.006   | < 2e-16   |
-| CONDITION                          | 1    | 2051   | 2051    | 1558.081  | < 2e-16   |
-| FIREPLACES                         | 8    | 518    | 65      | 49.145    | < 2e-16   |
-| log(TOTALROOMS + 0.01)             | 1    | 18     | 18      | 13.833    | 0.0002    |
-| EXTERIORFINISH                     | 1    | 342    | 342     | 260.133   | < 2e-16   |
-| I(SALEYEAR - YEARBLT)              | 1    | 81     | 81      | 61.394    | 4.70e-15  |
-| BEDROOMS                           | 12   | 33     | 3       | 2.103     | 0.0138    |
-| STORIES                             | 8    | 119    | 15      | 11.336    | 3.41e-16  |
 | as.factor(PROPERTYZIP.x)           | 37   | 12011  | 325     | 246.582   | < 2e-16   |
 | as.factor(SALEYEAR)                | 13   | 7691   | 592     | 449.356   | < 2e-16   |
+| ...                                | ..   | ....   | ...     | .......   | .......   |
 | Residuals                          | 140620 | 185128 | 1       |           |           |
 
 
@@ -312,10 +275,17 @@ In this alternative analysis, we aim to isolate the **underlying value of the lo
 
 Without controlling for the types of houses and other factors, we can see that over time the difference fluctuates much more than in our main analysis. This suggests that, when ignoring the influence of other variables such as house size, condition, and location, the differences in house prices across time appear more volatile. However, without accounting for these other factors, the **confidence intervals of differences between ZIP codes** become much smaller. This indicates that while the raw differences may appear larger, this indicates that the types of houses are similar within zip codes, but can vary widely between zip codes. This is why other confounding factors are important. When controlling for these factors, the differences between ZIP codes become less pronounced but more reliable.
 
-## Usage
 
-To use the project, follow these steps:
+## Libraries Used
 
-1. **Clone the Repository:**
-   ```bash
-   git clone https://github.com/yourusername/pittsburgh-housing-prices.git
+This project leverages the following R libraries:
+
+- **tidyverse**: For data manipulation and visualization.
+- **car**: For regression diagnostics and VIF (Variance Inflation Factor).
+- **ggplot2**: For creating visualizations.
+- **MASS**: For statistical modeling functions.
+- **readxl**: For reading Excel files (if needed).
+- **softImpute**: For matrix factorization techniques (if any missing values).
+- **stargazer**: For presenting summary statistics and regression results.
+- **gridExtra**: For arranging multiple plots in a grid.
+
