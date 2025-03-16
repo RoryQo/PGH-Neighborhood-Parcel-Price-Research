@@ -254,10 +254,12 @@ ANCOVA is performed to compare the mean prices of homes across different ZIP cod
 ### 7. Adjusted Means
 Finally, **adjusted means** for the housing prices across ZIP codes are calculated, accounting for nuisance variables like `GRADEDESC`, `SALEDESC.x`, and `HEATINGCOOLING`. These adjusted means are visualized to identify which ZIP codes are the most and least expensive.
 
+#### Transformed Power Model
 <p align="center">
   <img src="https://github.com/RoryQo/PGH-Neighborhood-Housing-Price-Analysis/blob/main/Figures/Adj_Price_zip_transformed.jpg?raw=true" width=600px/>
 </p>
 
+#### WLS Model
 <p align="center">
   <img src="https://github.com/RoryQo/PGH-Neighborhood-Housing-Price-Analysis/blob/main/Figures/Adju_Price_zip_log.jpg?raw=true" width=600px/>
 </p>
@@ -266,11 +268,19 @@ Finally, **adjusted means** for the housing prices across ZIP codes are calculat
 
 ## Viewing Adjusted Mean Trends Through Time
 
-###
+## Viewing Trends over Geography
+
+<p align="center">
+  <img src="https://github.com/RoryQo/PGH-Neighborhood-Housing-Price-Analysis/blob/main/Figures/HeatMap.jpg?raw=true" width=600px/>
+</p>
+
+
+### WLS
 <p align="center">
   <img src="https://github.com/RoryQo/PGH-Neighborhood-Housing-Price-Analysis/blob/main/Figures/OGtime.jpg?raw=true" width=500px/>
 </p>
 
+##
 
 ## Simple Alternative Analysis Approach
 
