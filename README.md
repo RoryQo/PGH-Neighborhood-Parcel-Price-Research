@@ -75,13 +75,12 @@ The initial steps involve exploring the data with summary statistics and visuali
 - **Summary Statistics**: Basic descriptive statistics for the dataset are calculated.
 - **Price by ZIP Code**: The average housing prices per ZIP code are computed and visualized using a bar chart with error bars indicating the standard error of the mean.
 
-  | Statistic            | N       | Mean        | St. Dev.     | Min       | Max         |
+
+| Statistic            | N       | Mean        | St. Dev.     | Min       | Max         |
 |----------------------|---------|-------------|--------------|-----------|-------------|
-| PROPERTYZIP.x        | 146,470 | 15,220.930  | 12.431       | 15,201    | 15,243      |
 | LOTAREA              | 146,470 | 8,215.283   | 23,225.260   | 0         | 2,337,386   |
 | STORIES              | 146,470 | 1.742       | 0.501        | 1.000     | 4.000       |
 | YEARBLT              | 146,470 | 1,937.094   | 27.891       | 1,780     | 2,024       |
-| EXTERIORFINISH       | 146,470 | 2.280       | 1.520        | 1         | 8           |
 | BASEMENT             | 146,470 | 4.753       | 0.900        | 1         | 5           |
 | GRADEDESC            | 146,457 | 7.834       | 1.682        | 1         | 19          |
 | CONDITION            | 146,470 | 3.143       | 0.796        | 1         | 8           |
