@@ -76,6 +76,11 @@ The initial steps involve exploring the data with summary statistics and visuali
 - **Price by ZIP Code**: The average housing prices per ZIP code are computed and visualized using a bar chart with error bars indicating the standard error of the mean.
 
 
+<p align="center">
+  <img src="https://github.com/RoryQo/PGH-Neighborhood-Housing-Price-Analysis/blob/main/Figures/Unadj_Price_zip.jpg?raw=true" width=600px/>
+</p>
+
+
 | Statistic            | N       | Mean        | St. Dev.     | Min       | Max         |
 |----------------------|---------|-------------|--------------|-----------|-------------|
 | LOTAREA              | 146,470 | 8,215.283   | 23,225.260   | 0         | 2,337,386   |
@@ -117,34 +122,186 @@ The **null model** includes only an intercept, essentially predicting the mean p
 The **best model** is selected using a stepwise selection process. This function selects the best predictors based on AIC (Akaike Information Criterion), which balances model fit and complexity.
 
 ### 3. Model Diagnostics
+
+<p align="center">
+  <img src="https://github.com/RoryQo/PGH-Neighborhood-Housing-Price-Analysis/blob/main/Figures/Best_modelDiag.jpg?raw=true" width="500"/>
+</p>
+
 - **Multicollinearity**: The variance inflation factor (VIF) is calculated to check for multicollinearity among the predictors. A VIF value greater than 10 indicates high collinearity.
 - **Influential Points**: Cook's Distance is used to identify and remove highly influential points that might distort the model’s estimates.
-- **Heteroskedasticity**: The Breusch-Pagan test is used to detect heteroskedasticity (non-constant variance of residuals). If detected, robust standard errors are applied to correct for this issue.
+- **Heteroskedasticity**: The Breusch-Pagan test detected heteroskedasticity (non-constant variance of residuals). Robust standard errors are applied to correct for this issue.
 
-### 4. Log Transformation
+### 4 Adressing Diagnostics
+```
+# 3. Check for multicollinearity using VIF
+vif_values <- vif(model)
+print(vif_values)
+```
+
+#### GVIF and GVIF^(1/(2*Df)) for Variables
+
+| Variable                            | GVIF       | Df  | GVIF^(1/(2*Df)) |
+|-------------------------------------|------------|-----|-----------------|
+| GRADEDESC                           | 1.839543   | 1   | 1.356298        |
+| log(FINISHEDLIVINGAREA + 0.001)     | 3.509536   | 1   | 1.873376        |
+| SALEDESC.x                          | 1.274342   | 25  | 1.004860        |
+| HEATINGCOOLING                      | 1.777424   | 15  | 1.019357        |
+| STYLE                                | 2813.159214| 28  | 1.152372        |
+| FULLBATHS                           | 3.333085   | 9   | 1.069171        |
+| log(LOTAREA + 0.001)                | 39.207922  | 1   | 6.261623        |
+| HALFBATHS                           | 1.549149   | 7   | 1.031759        |
+| CONDITION                           | 1.118446   | 1   | 1.057566        |
+| FIREPLACES                          | 1.486511   | 8   | 1.025087        |
+| log(TOTALROOMS + 0.001)             | 4.141634   | 1   | 2.035100        |
+| EXTERIORFINISH                      | 1.110825   | 1   | 1.053957        |
+| BEDROOMS                            | 6.372283   | 13  | 1.073827        |
+| STORIES                              | 15.339543  | 10  | 1.146280        |
+| AGE                                  | 3.318723   | 1   | 1.821736        |
+
+
+
+#### Identify and remove influential points based on Cook’s Distance
+
+```
+influence <- influence.measures(model)
+high_influence <- which(influence$infmat[, "cook.d"] > 4/(nrow(df)-length(model$coefficients)-2))
+df <- df[-high_influence, ]
+```
+
+#### Weighted Least Squares Approach
+
+By applying weights based on the fitted values from an initial model, WLS minimizes the influence of high-variance observations, providing more accurate estimates of the regression coefficients. In **OLS regression**, the ordinary least squares method minimizes the sum of squared residuals under the assumption that the variance of residuals is constant across all levels of the independent variables (homoscedasticity). However, when there is **heteroscedasticity** (non-constant variance of residuals), OLS estimates become inefficient, and the standard errors of the coefficients may be biased. 
+
+To address this, **Weighted Least Squares (WLS)** regression applies a **weight** to each observation, which accounts for the varying variability in the data. The weights are typically the **inverse of the variance** of each observation, and they down-weight observations that have larger residuals (i.e., higher variance) and up-weight those with smaller residuals (i.e., lower variance).
+
+The weights are computed as the inverse of the fitted values from an initial **OLS regression** model:
 
 ```math
-\text{PRICE} = \beta_0 + \beta_1 \cdot \text{GRADEDESC} + \beta_2 \cdot \log(\text{FINISHEDLIVINGAREA} + 0.01) + \beta_3 \cdot \text{SALEDESC.x} + \beta_4 \cdot \text{HEATINGCOOLING} + \beta_5 \cdot \text{STYLE} + \beta_6 \cdot \text{FULLBATHS} + \beta_7 \cdot \log(\text{LOTAREA} + 0.01) + \beta_8 \cdot \text{HALFBATHS} + \beta_9 \cdot \text{CONDITION} + \beta_{10} \cdot \text{FIREPLACES} + \beta_{11} \cdot \log(\text{TOTALROOMS} + 0.01) + \beta_{12} \cdot \text{EXTERIORFINISH} + \beta_{13} \cdot (\text{SALEYEAR} - \text{YEARBLT}) + \beta_{14} \cdot \text{BEDROOMS} + \beta_{15} \cdot \text{STORIES} + \epsilon
+w_i = \frac{1}{\sqrt{\hat{y}_i}}
 ```
+
+```math
+\text{LOG\_PRICE} = \beta_0 + \beta_1 \times \text{GRADEDESC} + \beta_2 \times \log(\text{FINISHEDLIVINGAREA} + 0.01) + \beta_3 \times \text{SALEDESC.x} + 
+\beta_4 \times \text{HEATINGCOOLING} + \beta_5 \times \text{STYLE} + \beta_6 \times \text{FULLBATHS} + \beta_7 \times \log(\text{LOTAREA} + 0.01) + 
+\beta_8 \times \text{HALFBATHS} + \beta_9 \times \text{CONDITION} + \beta_{10} \times \text{FIREPLACES} + \beta_{11} \times \log(\text{TOTALROOMS} + 0.01) + 
+\beta_{12} \times \text{EXTERIORFINISH} + \beta_{13} \times (\text{SALEYEAR} - \text{YEARBLT}) + \beta_{14} \times \text{BEDROOMS} + \beta_{15} \times \text{STORIES} + \epsilon
+```
+
+#### Model Diagnostics
+
+<p align="center">
+<img src="https://github.com/RoryQo/PGH-Neighborhood-Housing-Price-Analysis/blob/main/Figures/1stdiag.jpg?raw=true" width=500px />
+</p>
 
 ### 5. Box-Cox Transformation
 The **Box-Cox transformation** is applied to the dependent variable (`PRICE`) to identify an optimal transformation (lambda) that improves the model’s normality. Weighted least squares was also attempted but performed worse, so it is omitted here, and continued by performing a Box-Cox test.
 
-### 6. Analysis of Covariance (ANCOVA)
-ANCOVA is performed to compare the mean prices of homes across different ZIP codes, adjusting for other variables in the model.
+<p align="center">
+  <img src="https://github.com/RoryQo/PGH-Neighborhood-Housing-Price-Analysis/blob/main/Figures/Box.jpg?raw=true" width="500"/>
+</p>
+
 
 ```math
-\text{PRICE} = \beta_0 + \beta_1 \cdot \text{PROPERTYZIP.x} + \beta_2 \cdot \text{GRADEDESC} + \beta_3 \cdot \text{TOTALROOMS} + \beta_4 \cdot \text{FINISHEDLIVINGAREA} + \beta_5 \cdot \text{SALEDESC.x} + \epsilon
+\text{PRICE\_transformed} = \sqrt{\text{PRICE}}
 ```
+
+#### Full Transformed Model
+```math
+\text{PRICE\_transformed} = \beta_0 + \beta_1 \times \text{GRADEDESC} + \beta_2 \times \log(\text{FINISHEDLIVINGAREA} + 0.01) + 
+\beta_3 \times \text{SALEDESC.x} + \beta_4 \times \text{HEATINGCOOLING} + \beta_5 \times \text{STYLE} + 
+\beta_6 \times \text{FULLBATHS} + \beta_7 \times \log(\text{LOTAREA} + 0.01) + \beta_8 \times \text{HALFBATHS} + 
+\beta_9 \times \text{CONDITION} + \beta_{10} \times \text{FIREPLACES} + \beta_{11} \times \log(\text{TOTALROOMS} + 0.01) + 
+\beta_{12} \times \text{EXTERIORFINISH} + \beta_{13} \times (\text{SALEYEAR} - \text{YEARBLT}) + 
+\beta_{14} \times \text{BEDROOMS} + \beta_{15} \times \text{STORIES} + \beta_{16} \times \text{as.factor(PROPERTYZIP.x)} + 
+\beta_{17} \times \text{as.factor(SALEYEAR)} + \epsilon
+```
+#### Transformed Model Diagnostics
+
+<p align="center">
+  <img src="https://github.com/RoryQo/PGH-Neighborhood-Housing-Price-Analysis/blob/main/Figures/3rddiag.jpg?raw=true" width=500px/>
+</p>
+
+
+### 6. Analysis of Covariance (ANCOVA)
+ANCOVA is performed to compare the mean prices of homes across different ZIP codes, adjusting for other variables in the model. On both the transformed model and the wls model, since they are both incorrect, but are incorrect in opposite ways.  Taking them together can give us a more complete picture.
+
+#### ANOVA Table
+
+| Variable                           | Df   | Sum Sq | Mean Sq | F value   | Pr(>F)    |
+|------------------------------------|------|--------|---------|-----------|-----------|
+| GRADEDESC                          | 1    | 38174  | 38174   | 28996.014 | < 2e-16   |
+| log(FINISHEDLIVINGAREA + 0.01)     | 1    | 3431   | 3431    | 2606.093  | < 2e-16   |
+| SALEDESC.x                         | 25   | 78242  | 3130    | 2377.263  | < 2e-16   |
+| HEATINGCOOLING                     | 14   | 7635   | 545     | 414.258   | < 2e-16   |
+| STYLE                              | 23   | 4857   | 211     | 160.420   | < 2e-16   |
+| FULLBATHS                          | 7    | 897    | 128     | 97.320    | < 2e-16   |
+| log(LOTAREA + 0.01)                | 1    | 931    | 931     | 707.322   | < 2e-16   |
+| HALFBATHS                          | 6    | 829    | 138     | 105.006   | < 2e-16   |
+| CONDITION                          | 1    | 2051   | 2051    | 1558.081  | < 2e-16   |
+| FIREPLACES                         | 8    | 518    | 65      | 49.145    | < 2e-16   |
+| log(TOTALROOMS + 0.01)             | 1    | 18     | 18      | 13.833    | 0.0002    |
+| EXTERIORFINISH                     | 1    | 342    | 342     | 260.133   | < 2e-16   |
+| I(SALEYEAR - YEARBLT)              | 1    | 81     | 81      | 61.394    | 4.70e-15  |
+| BEDROOMS                           | 12   | 33     | 3       | 2.103     | 0.0138    |
+| STORIES                             | 8    | 119    | 15      | 11.336    | 3.41e-16  |
+| as.factor(PROPERTYZIP.x)           | 37   | 12011  | 325     | 246.582   | < 2e-16   |
+| as.factor(SALEYEAR)                | 13   | 7691   | 592     | 449.356   | < 2e-16   |
+| Residuals                          | 140620 | 185128 | 1       |           |           |
+
+
+
 
 ### 7. Adjusted Means
 Finally, **adjusted means** for the housing prices across ZIP codes are calculated, accounting for nuisance variables like `GRADEDESC`, `SALEDESC.x`, and `HEATINGCOOLING`. These adjusted means are visualized to identify which ZIP codes are the most and least expensive.
 
-## Visualizations
-Various visualizations are generated to help understand the trends in the data:
-- **Average Prices by ZIP Code**: A bar plot with error bars for each ZIP code showing the average price and its confidence interval.
-- **Adjusted Prices by ZIP Code**: A bar plot with adjusted prices based on the model’s results, including error bars and confidence intervals.
-- **Price Trends Over Time**: A line plot showing the adjusted prices for the top and bottom ZIP codes over time.
+<p align="center">
+  <img src="https://github.com/RoryQo/PGH-Neighborhood-Housing-Price-Analysis/blob/main/Figures/Adj_Price_zip_transformed.jpg?raw=true" width=600px/>
+</p>
+
+<p align="center">
+  <img src="https://github.com/RoryQo/PGH-Neighborhood-Housing-Price-Analysis/blob/main/Figures/Adju_Price_zip_log.jpg?raw=true" width=600px/>
+</p>
+
+
+
+## Viewing Adjuested Mean Trends Through Time
+
+###
+<p align="center">
+  <img src="https://github.com/RoryQo/PGH-Neighborhood-Housing-Price-Analysis/blob/main/Figures/OGtime.jpg?raw=true" width=500px/>
+</p>
+
+
+## Simple Alternative Analysis Approach
+
+In this alternative analysis, we aim to isolate the **underlying value of the location** by subtracting the **fair market value** of the house's physical structure (which includes the appraised value of the building and the lot) from the actual house price. This analysis is based on the assumption that the price of a house can be decomposed into two main components:
+
+- **Fair Market Value (FMV)**: The FMV is assumed to reflect the appraised value of both the land and the building itself. For this analysis, we subtract this value from the house price to estimate the **pure location value**.
+- **Location Value**: This value represents the premium placed on a property's location — factors such as proximity to schools, amenities, transportation, and other location-based advantages or disadvantages are not reflected by the FMV.
+### Process Overview:
+
+1. **Subtract Fair Market Value**: We subtract the **fair market value (FMV)** of the house (which is the combined appraised value of the building and the land) from the **price of the house**. This leaves us with the **location value**, which captures how much the area or neighborhood contributes to the house price, independent of its physical structure.
+
+```math
+    \text{Location\_Value} = \text{Price} - \text{Fair Market Value}
+```
+
+2. **Group Differences by ZIP Code**: After calculating the location value for each house, we group the **location value differences** by **ZIP code** to identify whether different areas command different underlying values that are not captured by the physical structure of the house itself.
+
+3. **Analysis Objective**: By comparing the location value across different ZIP codes, we can explore whether certain regions have significantly higher or lower underlying values, independent of the size or condition of the houses themselves. This allows us to assess how much value the **neighborhood or location** adds to the overall house price.
+
+
+### Interpretation of Results:
+
+
+
+<p align="center">
+  <img src="https://github.com/RoryQo/PGH-Neighborhood-Housing-Price-Analysis/blob/main/Figures/Diff%20Zip.jpg?raw=true" width="500"/>
+  <img src="https://github.com/RoryQo/PGH-Neighborhood-Housing-Price-Analysis/blob/main/Figures/Diff_Time.jpg?raw=true" width="500"/>
+</p>
+
+
+Without controlling for the types of houses and other factors, we can see that over time the difference fluctuates much more than in our main analysis. This suggests that, when ignoring the influence of other variables such as house size, condition, and location, the differences in house prices across time appear more volatile. However, without accounting for these other factors, the **confidence intervals of differences between ZIP codes** become much smaller. This indicates that while the raw differences may appear larger, this indicates that the types of houses are similar within zip codes, but can vary widely between zip codes. This is why other confounding factors are important. When controlling for these factors, the differences between ZIP codes become less pronounced but more reliable.
 
 ## Usage
 
