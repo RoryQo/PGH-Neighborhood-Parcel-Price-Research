@@ -38,8 +38,8 @@ This dataset includes **property characteristics** such as square footage, numbe
 - **Other Sale Descriptions**: Other sale descriptions, such as bank repossessions, could lead to lower sale prices. However, these are not equally distributed across ZIP codes and show an underlying pattern in the data. Since they provide valuable insights into the market, these observations were retained in the dataset.
 
 - **Zipcodes**: Zipcodes needed to have enough observations to get a valid comparison and average price, 4 zipcodes were dropped because they had many less observations than the others (< 220)
-- 
--**Interaction Grid**: Before building the max model and adjusting means we must check for interaction terms, a grid of scatter plots showing all possible interactions was created. **No interaction terms were significant**, and therefore not included in maximum model.
+  
+- **Interaction Grid**: Before building the max model and adjusting means we must check for interaction terms, a grid of scatter plots showing all possible interactions was created. **No interaction terms were significant**, and therefore not included in maximum model.
 
 ### Data Transformation
 
