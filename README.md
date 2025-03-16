@@ -171,7 +171,7 @@ w_i = \frac{1}{\sqrt{\hat{y}_i}}
 </p>
 
 ### 5. Box-Cox Transformation
-The **Box-Cox transformation** is applied to the dependent variable (`PRICE`) to identify an optimal transformation (lambda) that improves the model’s normality. Weighted least squares was also attempted but performed worse, so it is omitted here, and continued by performing a Box-Cox test.
+The **Box-Cox transformation** is applied to the dependent variable (`PRICE`) to identify an optimal transformation (lambda) that improves the model’s normality.
 
 <p align="center">
   <img src="https://github.com/RoryQo/PGH-Neighborhood-Housing-Price-Analysis/blob/main/Figures/Box.jpg?raw=true" width="500"/>
