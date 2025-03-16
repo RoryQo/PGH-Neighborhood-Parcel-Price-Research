@@ -268,6 +268,11 @@ Finally, **adjusted means** for the housing prices across ZIP codes are calculat
 
 ## Viewing Adjusted Mean Trends Through Time
 
+####  WLS Model
+<p align="center">
+  <img src="https://github.com/RoryQo/PGH-Neighborhood-Housing-Price-Analysis/blob/main/Figures/OGtime.jpg?raw=true" width=600px/>
+</p>
+
 ## Viewing Trends over Geography
 
 <p align="center">
@@ -275,14 +280,8 @@ Finally, **adjusted means** for the housing prices across ZIP codes are calculat
 </p>
 
 
-### WLS
-<p align="center">
-  <img src="https://github.com/RoryQo/PGH-Neighborhood-Housing-Price-Analysis/blob/main/Figures/OGtime.jpg?raw=true" width=500px/>
-</p>
 
-##
-
-## Simple Alternative Analysis Approach
+## Appendix: Simple Alternative Analysis Approach
 
 In this alternative analysis, we aim to isolate the **underlying value of the location** by subtracting the **fair market value** of the house's physical structure (which includes the appraised value of the building and the lot) from the actual house price. This analysis is based on the assumption that the price of a house can be decomposed into two main components:
 
