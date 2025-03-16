@@ -29,11 +29,15 @@ This dataset includes **property characteristics** such as square footage, numbe
 
 - **Merge**: Merge both data sets together horizontally on the key of zipcodes, then remove identical columns from the merge
 
+- **Pittsburgh Specific**: Since this is county wide data we filtered it to include only data that is within the Pittsburgh city limits (ie. City== Pittsburgh)
+
 - **Missing Values**: Approximately 20% of the 90,000 observations had missing data. After inspection, these missing values were determined to be random, so they were dropped. We retained enough remaining observations for meaningful analysis.
 
 - **Sale Descriptions**: The sale descriptions labeled as "love and affection" were removed because they were associated with very low sale prices that did not reflect accurate market values. Upon inspection, the rate of these sales was stable across ZIP codes, so they were deemed to distort the overall analysis. 
 
 - **Other Sale Descriptions**: Other sale descriptions, such as bank repossessions, could lead to lower sale prices. However, these are not equally distributed across ZIP codes and show an underlying pattern in the data. Since they provide valuable insights into the market, these observations were retained in the dataset.
+
+- **Zipcodes**: Zipcodes needed to have enough observations to get a valid comparison and average price, 4 zipcodes were dropped because they had many less observations than the others (< 220)
 
 ### Data Transformation
 
