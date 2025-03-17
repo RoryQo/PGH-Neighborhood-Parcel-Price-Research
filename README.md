@@ -102,7 +102,16 @@ The **null model** includes only an intercept, essentially predicting the mean p
 ```
 
 #### c. Stepwise Model Selection
-The **best model** is selected using a stepwise selection process. This function selects the best predictors based on AIC (Akaike Information Criterion), which balances model fit and complexity.
+The **best model** is selected using a stepwise selection process. This function selects the best predictors based on AIC (Akaike Information Criterion), which balances model fit and complexity. This model will give us an intial jumping off point for future transformations and analysis.
+
+
+```math
+\text{PRICE} = \beta_0 + \beta_1 \cdot \text{GRADEDESC} + \beta_2 \cdot \text{FINISHEDLIVINGAREA} + \beta_3 \cdot \text{SALEDESC.x} + \beta_4 \cdot \text{SALEYEAR} + \beta_5 \cdot \text{HEATINGCOOLING} + \beta_6 \cdot \text{STYLE} + \beta_7 \cdot \text{FULLBATHS} + \beta_8 \cdot \text{LOTAREA} + \beta_9 \cdot \text{HALFBATHS} + \beta_{10} \cdot \text{CONDITION} + \beta_{11} \cdot \text{FIREPLACES} + \beta_{12} \cdot \text{TOTALROOMS} + \beta_{13} \cdot \text{EXTERIORFINISH} + \beta_{14} \cdot \text{YEARBLT} + \beta_{15} \cdot \text{BEDROOMS} + \beta_{16} \cdot \text{STORIES} + \epsilon
+```
+
+```
+best_model = step(min_model, direction = "both", scope = max_model)
+```
 
 ### 3. Model Diagnostics
 
@@ -115,6 +124,7 @@ The **best model** is selected using a stepwise selection process. This function
 - **Heteroskedasticity**: The Breusch-Pagan test detected heteroskedasticity (non-constant variance of residuals). Robust standard errors are applied to correct for this issue.
 
 ### 4 Adressing Diagnostics
+
 ```
 # 3. Check for multicollinearity using VIF
 vif_values <- vif(model)
@@ -177,7 +187,13 @@ w_i = \frac{1}{\sqrt{\hat{y}_i}}
 </p>
 
 ### 5. Box-Cox Transformation
-The **Box-Cox transformation** is applied to the dependent variable (`PRICE`) to identify an optimal transformation (lambda) that improves the model’s normality.
+The **Box-Cox transformation** is applied to the dependent variable (`PRICE`) to identify an optimal transformation (lambda) that improves the model’s normality. The test revealed that the optimal value of \(\lambda\) was **2**. This suggests that applying a square transformation to the data (i.e., `PRICE^2`) would be the most effective. However, to handle the skewness effectively, we applied the **square root transformation** instead, which is a commonly used method for right-skewed data such as housing prices. we compared the square root version to the squared version, and the square root version diagnostic was significantly better than the squared. 
+
+The general formula for the Box-Cox transformation is as follows:
+
+```math
+\text{PRICE\_transformed} = \frac{\text{PRICE}^\lambda - 1}{\lambda} \quad \text{if} \quad \lambda \neq 0
+```
 
 <p align="center">
   <img src="https://github.com/RoryQo/PGH-Neighborhood-Housing-Price-Analysis/blob/main/Figures/Box.jpg?raw=true" width="500"/>
@@ -206,7 +222,7 @@ The **Box-Cox transformation** is applied to the dependent variable (`PRICE`) to
 
 
 ### 6. Analysis of Covariance (ANCOVA)
-ANCOVA is performed to compare the mean prices of homes across different ZIP codes, adjusting for other variables in the model. On both the transformed model and the wls model, since they are both incorrect, but are incorrect in opposite ways.  Taking them together can give us a more complete picture.
+ANCOVA is performed to compare the mean prices of homes across different ZIP codes, adjusting for other variables in the model. The significance of sale year and zipcode tells us that there is significant variation in housing prices from these variables, controlling for all other property and land characteristics from our previous models. Moving forward, we will calculate adjusted means for both the transformed model and the wls model, since they are both incorrect, but are incorrect in opposite ways.  Taking them together can give us a more complete picture.
 
 #### ANOVA Table
 
@@ -233,7 +249,18 @@ Finally, **adjusted means** for the housing prices across ZIP codes are calculat
   <img src="https://github.com/RoryQo/PGH-Neighborhood-Housing-Price-Analysis/blob/main/Figures/Adju_Price_zip_log.jpg?raw=true" width=600px/>
 </p>
 
+While the adjusted average housing prices across various Pittsburgh ZIP codes show clear trends, it is important to interpret the data with caution:
 
+**Overlapping Confidence Intervals:**
+
+
+The overlapping error bars in the visualizations for the top and bottom ZIP codes indicate that, while the prices for these areas differ, the variation within these neighborhoods makes it difficult to confidently state that one ZIP code is definitively the most expensive or on the other hand the cheapest.
+
+**Significant Price Differences Between Highest and Lowest ZIP Codes:**
+
+The red line in the visualization represents the upper limit of the confidence interval for the lowest-priced ZIP code. This means that, while there is overlap in some of the adjusted mean prices, those ZIP codes whose lower confidence interval does not cross the red line can be considered significantly different in terms of pricing from the lowest-priced neighborhood.
+
+Despite the overlapping error within the groups of ZIP codes (highest price and lowest priced), we can confidently say that there is a significant difference in price when comparing the highest and lowest priced neighborhoods, holding all house and land features constant. The clear price gap between these groups indicates that the factors driving high prices in areas like 15232 are substantially different from those in areas like 15235, even after accounting for property features such as size, age, and condition.
 
 ## Viewing Adjusted Mean Trends Through Time
 
@@ -241,6 +268,15 @@ Finally, **adjusted means** for the housing prices across ZIP codes are calculat
 <p align="center">
   <img src="https://github.com/RoryQo/PGH-Neighborhood-Housing-Price-Analysis/blob/main/Figures/OGtime.jpg?raw=true" width=600px/>
 </p>
+
+The adjusted average housing prices across various Pittsburgh ZIP codes reveal important insights into the housing market dynamics:
+
+**Parallel Trends Across ZIP Codes:**
+
+Both the top three highest and lowest ZIP codes in terms of housing prices, including 15232, 15217, 15222 (high-priced areas), and 15204, 15210, 15235 (lower-priced areas), show fairly parallel trends over time. Despite differences in their price levels, all these areas have experienced similar effects from broader market forces such as inflation and fluctuations in the housing market.
+Influence of Timing and Inflation:
+
+This suggests that, although the price points differ across neighborhoods, the overall trend of increasing housing prices (with occasional fluctuations) has been a common experience for both high-end and more affordable areas. This trend reflects a generalized market shift rather than isolated changes in individual neighborhoods.
 
 ## Viewing Trends over Geography
 
