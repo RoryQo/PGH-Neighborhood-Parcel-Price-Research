@@ -297,13 +297,102 @@ Influence of Timing and Inflation:
 
 This suggests that, although the price points differ across neighborhoods, the overall trend of increasing housing prices (with occasional fluctuations) has been a common experience for both high-end and more affordable areas. This trend reflects a generalized market shift rather than isolated changes in individual neighborhoods.
 
-## Viewing Trends over Geography
+## Geo-Spatial Analysis
 
 <p align="center">
-  <img src="https://github.com/RoryQo/PGH-Neighborhood-Housing-Price-Analysis/blob/main/Figures/HeatMap.jpg?raw=true" width=600px/>
+    <img src="https://github.com/RoryQo/PGH-Neighborhood-Housing-Price-Analysis/blob/main/Figures/HousepriceG.png" alt="Housing Price Analysis" width=500px />
 </p>
 
 
+## Analyzing Factors Influencing Housing Prices in Pittsburgh ZIP Codes
+
+The aim of this analysis is to understand why certain ZIP codes in Pittsburgh have higher housing prices than others by analyzing factors such as **crime rates**, **school district quality**, and other socioeconomic factors. By combining spatial, demographic, and geographic data, this project provides a comprehensive analysis of the key drivers behind property value disparities across Pittsburgh.
+
+## Data Sources
+
+### 1. **Housing Price Data** (`ADJPrice.csv`)
+   - **Source**: Real estate listings and property data for Pittsburgh.
+   - **Details**: This dataset contains adjusted housing prices for properties in Pittsburgh, including ZIP codes and property features. This dataset helps map housing price trends geographically.
+
+### 2. **Crime Data** (`e03a89dd-134a-4ee8-a2bd-62c40aeebc6f.csv`)
+   - **Source**: Pittsburgh’s public crime reporting system.
+   - **Details**: Contains data on criminal incidents (arrests) in Pittsburgh, including coordinates of incidents. This data is used to calculate **arrest density**, which helps us understand the relationship between crime rates and housing prices.
+
+### 3. **Geospatial Data**:
+   - **ZIP Code Boundaries** (`zips.geojson`): Geographic boundaries of Pittsburgh ZIP codes, which are essential for visualizing housing prices geographically and merging them with crime and school district data.
+   - **School District Boundaries** (`alcogisallegheny-county-school-district-boundaries.geojson`): Boundaries of school districts in Pittsburgh. School quality plays a significant role in determining the desirability of an area, and this dataset is used to examine how school district rankings impact housing prices.
+
+### 4. **Population Data** (Manually Compiled)
+   - A dataset containing population figures for each ZIP code, used to understand how population density influences housing prices in Pittsburgh.
+
+## Methodology
+
+### Data Merging and Preparation
+
+The analysis requires integrating data from various sources with different structures. The key merging steps are:
+
+1. **Merge Housing Prices with ZIP Codes**: Merge the `zipcode_avg_price` dataset (which contains average prices by ZIP code) with the `zips` GeoDataFrame to analyze how prices vary geographically.
+2. **Merge Crime Data**: Perform a spatial join between the **crime data** (arrest incidents) and the **ZIP code boundaries** to calculate **arrest density** in each ZIP code.
+3. **School District Data Integration**: Using fuzzy matching, align the **school district rankings** to the corresponding **ZIP codes**.
+4. **Population Data Merge**: Merge population data with arrest counts to normalize arrest density by population, allowing for a more accurate comparison of crime rates across neighborhoods.
+
+### Crime Data Analysis
+
+#### Crime Data and Its Importance
+
+Crime is often a significant factor affecting property values. Areas with higher crime rates typically see lower property values due to concerns over safety. **Crime data** in this project comes from Pittsburgh’s public crime reporting system, which provides details on incidents, including arrests, and the locations (latitude and longitude) of these events.
+
+#### Steps for Crime Data Integration:
+
+1. **Geo-spatial Join**: Crime data, which contains coordinates for each incident, is joined with the **ZIP code boundaries** using **GeoPandas**. This spatial join links each crime incident to a specific ZIP code.
+   
+2. **Arrest Density Calculation**: The number of arrests in each ZIP code is divided by the area of the ZIP code to calculate **arrest density**—the number of arrests per square meter. High arrest density in a ZIP code typically correlates with lower property values, which is expected based on general urban real estate trends.
+
+3. **Crime Rate and Housing Prices**: Once the arrest density is calculated, it is merged with the **housing price data**. This allows us to explore how areas with higher crime rates (higher arrest density) correlate with lower property values.
+
+
+<p align="center">
+    <img src="https://github.com/RoryQo/PGH-Neighborhood-Housing-Price-Analysis/blob/main/Figures/Arrest_density.png" alt="Housing Price Analysis" width=500px />
+</p>
+
+#### Insights from Crime Data:
+- **Higher crime rates** are generally associated with **lower property prices**.
+- **Crime hotspots** in Pittsburgh, where arrest density is high, show a marked decrease in average housing prices compared to safer neighborhoods.
+- **Neighborhoods with low crime rates** tend to have higher property values, highlighting the importance of safety as a key factor in homebuying decisions.
+
+### School District Data Analysis
+
+#### School Districts and Their Influence on Housing Prices
+
+The quality of local schools is often a significant factor in determining real estate prices, as many homebuyers are willing to pay a premium for access to high-performing school districts. For this project, school district boundaries were mapped using the **GeoJSON file for school districts** in Allegheny County, Pittsburgh.
+
+#### Steps for School District Data Integration:
+
+1. **Fuzzy Matching**: Because the names of school districts in the external dataset may not exactly match those in the ZIP code data, fuzzy matching techniques were used to align school district names to the correct ZIP codes.
+   
+2. **Merging School District Boundaries**: After the fuzzy matching, the **school district boundaries** were merged with the **ZIP codes** to associate each ZIP code with its corresponding school district.
+
+<p align="center">
+    <img src="https://github.com/RoryQo/PGH-Neighborhood-Housing-Price-Analysis/blob/main/Figures/distandzip.png" alt="Housing Price Analysis" width=400px />
+</p>
+
+3. **School District Rankings**: School district rankings were then linked to each ZIP code. Since the zipcodes and school district lines do not perfectly match up we average the rank of each school within the zipcode. A higher ranking (indicating a better-performing school district) is associated with a higher price for homes in that ZIP code, as families often prioritize access to quality education.
+
+4. **Rank Inversion**: To ensure better clarity in interpretation, the school district ranking values were inverted, so that a higher value represented a better-ranked school district.
+
+
+<p align="center">
+    <img src="https://github.com/RoryQo/PGH-Neighborhood-Housing-Price-Analysis/blob/main/Figures/schoolrank.png" alt="Housing Price Analysis" width=500px />
+</p>
+
+
+#### Insights from School District Data:
+- **Better-performing school districts** correlate with **higher housing prices**. Homebuyers are often willing to pay more for properties located in areas with highly-ranked schools.
+- **Areas with high-ranked schools** (such as Mt. Lebanon, Fox Chapel, and Pine-Richland) exhibit higher property values, making school district quality a significant factor in the housing price equation.
+- **Neighborhoods with poor-performing schools** tend to have more affordable housing, which might be due to lower demand for homes in those areas.
+
+### Geographic Trends:
+- Certain **neighborhoods** in Pittsburgh, even without the best-ranked schools or lowest crime rates, maintain higher property values due to geographic features such as proximity to the city center or desirable scenic views.
 
 ## Appendix: Simple Alternative Analysis Approach
 
