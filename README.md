@@ -25,6 +25,25 @@ This dataset provides **transactional data** from 2013 to the present. It includ
 This dataset includes **property characteristics** such as square footage, number of rooms, property condition, and assessment values. It provides detailed information about the physical attributes of properties, which is essential for modeling house prices.  
 **Note**: The primary key is **PARID**, which corresponds to the **PIN** (Property Identification Number), ensuring that it can be matched with transactional data.
 
+### Pittsburgh Police Arrest Data
+
+[![View Original Research Paper](https://img.shields.io/badge/Pittsburgh%20Arrest%20Data-0056A0?style=flat&logo=external-link&logoColor=white&color=0056A0)](https://catalog.data.gov/dataset/pittsburgh-police-arrest-data)
+
+Arrest data contains information on people taken into custody by City of Pittsburgh police officers. More serious crimes such as felony offenses are more likely to result in an arrest. However, arrests can occur as a result of other offenses, such as parole violations or a failure to appear for trial. All data is reported at the block/intersection level, with the exception of sex crimes, which are reported at the police zone level.
+
+This dataset only contains information reported by City of Pittsburgh Police. It does not contain information about incidents that solely involve other police departments operating within the city (for example, campus police or Port Authority police).
+
+### Allgeheny County ZipCode Boundries
+
+[![View Original Research Paper](https://img.shields.io/badge/Zipcode%20Boundries%20Data-0056A0?style=flat&logo=external-link&logoColor=white&color=0056A0)](https://catalog.data.gov/dataset/allegheny-county-zip-code-boundaries)
+
+
+This dataset demarcates the zip code boundaries that lie within Allegheny County.If viewing this description on the Western Pennsylvania Regional Data Center’s open data portal, this dataset is harvested on a weekly basis from Allegheny County’s GIS data portal
+
+
+
+
+
 ### Data Cleaning & Preprocessing
 
 - **Merge**: Merge both data sets together horizontally on the key of zipcodes, then remove identical columns from the merge
