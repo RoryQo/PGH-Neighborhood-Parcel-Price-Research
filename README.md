@@ -297,6 +297,15 @@ Influence of Timing and Inflation:
 
 This suggests that, although the price points differ across neighborhoods, the overall trend of increasing housing prices (with occasional fluctuations) has been a common experience for both high-end and more affordable areas. This trend reflects a generalized market shift rather than isolated changes in individual neighborhoods.
 
+## Price Difference Between Most Expensive and Least Expensive ZIP Codes
+
+| Metric                                             | Value                |
+|----------------------------------------------------|----------------------|
+| **Max CI Difference** (most expensive - least expensive) | 426965.34            |
+| **Min CI Difference** (most expensive - least expensive) | 170959.97            |
+| **Average Predicted Price Difference**            | 426965.34            |
+
+
 ## Geo-Spatial Analysis
 
 <p align="center">
