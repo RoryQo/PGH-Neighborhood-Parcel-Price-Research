@@ -301,9 +301,9 @@ This suggests that, although the price points differ across neighborhoods, the o
 
 | Metric                                             | Value                |
 |----------------------------------------------------|----------------------|
-| **Max CI Difference** (most expensive - least expensive) | 426965.34            |
-| **Min CI Difference** (most expensive - least expensive) | 170959.97            |
-| **Average Predicted Price Difference**            | 426965.34            |
+| **Max CI Difference**  | $426965.34            |
+| **Min CI Difference**  | $170959.97            |
+| **Average Predicted Price Difference**            | $426965.34            |
 
 
 ## Geo-Spatial Analysis
