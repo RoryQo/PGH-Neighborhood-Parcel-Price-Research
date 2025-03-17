@@ -1,0 +1,310 @@
+---
+title: "PGH Housing Prices"
+author: "Rory Quinlan"
+date: "2025-03-13"
+output: html_document
+---
+
+```{r}
+library(tidyverse)
+library(car)
+library(ggplot2)
+library(MASS)
+library(readxl)
+library(softImpute)
+```
+
+```{r}
+
+# Read Data
+Trans= read.csv("C:\\Users\\roryq\\Downloads\\MQE_Data\\Transact.csv", header=T, sep= ",")
+colnames(Trans)
+
+```
+
+```{r}
+
+Asess = read.csv('C:\\Users\\roryq\\Downloads\\MQE_Data\\Assesor.csv', header=T, sep=",")
+colnames(Asess)
+Asess$TOTALROOMS
+
+```
+
+### Data Wrangling
+
+```{r}
+
+# Horizontal merge data by key PARID
+df <- merge(x=Trans,y=Asess, 
+      by.x=c("PARID","PARID"), 
+      by.y=c("PARID","PARID"))
+```
+
+
+```{r}
+# Vector to store columns that are identical
+columns_to_remove <- vector()
+
+# Loop through each column and compare it with every other column
+for(i in 1:(ncol(df)-1)) {  # Loop over all columns except the last one
+  for(j in (i+1):ncol(df)) {  # Compare the current column to all subsequent columns
+    # Check if columns i and j are identical
+    if(identical(df[[i]], df[[j]])) {
+      print(paste("Column", names(df)[i], "and", names(df)[j], "are identical"))
+      # Add column j to the list of columns to remove (since it's a duplicate of column i)
+      columns_to_remove <- c(columns_to_remove, names(df)[j])
+    }
+  }
+}
+
+print(columns_to_remove)
+```
+
+
+```{r}
+# Remove duplicated columns from the data frame
+df <- df[, !(names(df) %in% columns_to_remove)]
+
+colnames(df)
+```
+
+
+### Question 1.)
+
+#### EDA
+
+```{r}
+# Specify the columns for counting unique values
+columns_to_count <- c('PROPERTYZIP.x', 'PROPERTYCITY.x', 'MUNICODE.x', 'SCHOOLCODE.x')
+
+# Loop over the specified columns and print the count for each
+for (col in columns_to_count) {
+  print(paste("Count for column:", col))
+  print(table(df[[col]]))
+  cat("\n")  # Add a newline for better readability
+}
+```
+```{r}
+# Filter the dataset for Pittsburgh
+pittsburgh_data <- df[df$PROPERTYCITY.x == "PITTSBURGH", ]
+
+# Count the number of properties in each ZIP code within Pittsburgh
+zip_counts <- table(pittsburgh_data$PROPERTYZIP.x)
+
+# Print out the counts for each ZIP code within Pittsburgh
+print(zip_counts)
+```
+
+```{r}
+# Step 2: Create a vector of valid ZIP codes (those with 30 or more observations)
+valid_zipcodes <- c(15201, 15202, 15203, 15204, 15205, 15206, 15207, 15208, 15209, 15210, 15211, 15212, 15213, 15214, 15215, 15216, 15217, 15218,15219, 15220, 15221, 15222, 15223, 15224, 15226, 15227, 15228, 15229, 15232, 15233, 15234, 15235, 15236, 15237, 15238, 15239, 15241, 15243)
+
+# Step 3: Filter the data frame to only include rows with valid ZIP codes
+pittsburgh_data <- df %>%
+  filter(PROPERTYZIP.x %in% valid_zipcodes)
+```
+
+
+```{r}
+colnames(pittsburgh_data)
+```
+
+```{r}
+# Assuming your data frame is called df
+missing_data <- data.frame(Column = colnames(df), Missing_Percentage = NA)
+
+# Loop through each column and calculate the missing percentage
+for (i in 1:ncol(df)) {
+  missing_data$Missing_Percentage[i] <- sum(is.na(df[[i]])) / nrow(df) * 100
+}
+
+# View the result
+print(missing_data)
+
+```
+```{r}
+# Filter rows for "LOVE AND AFFECTION SALE" and count by zipcode
+love_affection_sales_by_zipcode <- pittsburgh_data %>%
+  filter(SALEDESC.x == "LOVE AND AFFECTION SALE") %>%
+  group_by(PROPERTYZIP.x) %>%
+  summarise(count = n())
+
+# View the result
+print(love_affection_sales_by_zipcode)
+```
+```{r}
+
+# Step 1: Calculate the count of "LOVE AND AFFECTION SALE" for each ZIP code
+love_affection_sales_by_zipcode <- pittsburgh_data %>%
+  filter(SALEDESC.x == "LOVE AND AFFECTION SALE") %>%
+  group_by(PROPERTYZIP.x) %>%
+  summarise(love_affection_count = n()) %>%
+  ungroup()
+
+# Step 2: Calculate the total number of sales for each ZIP code
+total_sales_by_zipcode <- pittsburgh_data %>%
+  group_by(PROPERTYZIP.x) %>%
+  summarise(total_sales_count = n()) %>%
+  ungroup()
+
+# Step 3: Merge the two datasets by ZIP code
+merged_data <- love_affection_sales_by_zipcode %>%
+  left_join(total_sales_by_zipcode, by = "PROPERTYZIP.x")
+
+# Step 4: Calculate the percentage of "LOVE AND AFFECTION SALE" for each ZIP code
+merged_data <- merged_data %>%
+  mutate(percentage_love_affection = (love_affection_count / total_sales_count) * 100)
+
+# Step 5: View the result
+print(merged_data)
+
+
+```
+
+
+```{r}
+# Remove love and affection sales as these dont reveal information about actual market price
+pittsburgh_data <- pittsburgh_data[pittsburgh_data$SALEDESC.x != "LOVE AND AFFECTION SALE", ]
+
+```
+
+```{r}
+table(pittsburgh_data$PROPERTYZIP.x)
+```
+
+
+```{r}
+
+# Extract the first four characters from SALEDATE.x to get the year
+pittsburgh_data$SALEYEAR <- substr(pittsburgh_data$SALEDATE.x, 1, 4)
+
+# Convert SALEYEAR to a factor
+pittsburgh_data$SALEYEAR <- as.factor(pittsburgh_data$SALEYEAR)
+
+head(pittsburgh_data$SALEYEAR)
+```
+```{r}
+# Convert SALEPRICE to numeric
+pittsburgh_data$PRICE <- as.numeric(pittsburgh_data$PRICE)
+
+```
+
+
+```{r}
+# Calculate average price and standard error of the mean (SEM) for each ZIP code
+zipcode_summary <- pittsburgh_data %>%
+  group_by(PROPERTYZIP.x) %>%
+  summarise(
+    avg_price = mean(PRICE, na.rm = TRUE),
+    sem_price = sd(PRICE, na.rm = TRUE) / sqrt(n())  # Standard error of the mean
+  )
+
+# Create a plot with error bars for the average price by ZIP code
+ggplot(zipcode_summary, aes(x = PROPERTYZIP.x, y = avg_price)) +
+  geom_bar(stat = "identity", fill = "skyblue", color = "black", width = 0.7) +  # Bar plot
+  geom_errorbar(aes(ymin = avg_price - sem_price, ymax = avg_price + sem_price), 
+                width = 0.2, color = "red") +  # Error bars
+  labs(title = "Average House Price by ZIP Code",
+       x = "ZIP Code",
+       y = "Average House Price") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +  # Rotate X-axis labels for better readability
+  theme_minimal()
+```
+
+
+
+
+
+
+# List of interaction terms
+interaction_vars <- c("LOTAREA", "HOMESTEADFLAG", "CLEANGREEN", "FARMSTEADFLAG", 
+                      "ABATEMENTFLAG", "STYLE", "STORIES", "YEARBLT", 
+                      "EXTERIORFINISH", "BASEMENT", "GRADE", "CONDITION", 
+                      "TOTALROOMS", "BEDROOMS", "FULLBATHS", "HALFBATHS", 
+                      "HEATINGCOOLING", "FIREPLACES", "BSMTGARAGE", "FINISHEDLIVINGAREA")
+
+# Create interaction plots for pairs of variables
+for (i in 1:(length(interaction_vars)-1)) {
+  for (j in (i+1):length(interaction_vars)) {
+    var1 <- interaction_vars[i]
+    var2 <- interaction_vars[j]
+    
+    # Create interaction plot for the pair of variables
+    p <- ggplot(sampled_data, aes_string(x = var1, y = "PRICE", color = var2)) +
+      geom_point(alpha = 0.6) +  # Add scatter points with slight transparency
+      geom_smooth(method = "lm", aes(group = var2), se = FALSE) +  # Add separate regression lines for different values of var2
+      labs(title = paste("Interaction Between", var1, "and", var2, "on PRICE"), 
+           x = var1, 
+           y = "Price") +
+      theme_minimal() +
+      theme(legend.position = "top")  # Remove the legend
+    
+    # Display the plot
+    print(p)
+  }
+}
+
+```{r}
+unique(pittsburgh_data$GRADE)
+unique(pittsburgh_data$GRADEDESC)
+unique(pittsburgh_data$HEATINGCOOLINGDESC)
+unique(pittsburgh_data$FIREPLACES)
+unique(pittsburgh_data$CONDITION)
+```
+
+
+
+
+
+```{r}
+pgh<- pittsburgh_data %>% dplyr::select(PROPERTYZIP.x, LOTAREA, STYLE, STORIES, YEARBLT, 
+                EXTERIORFINISH, BASEMENT, GRADEDESC, CONDITION, TOTALROOMS, 
+                BEDROOMS, FULLBATHS, HALFBATHS, HEATINGCOOLING, FIREPLACES, 
+                BSMTGARAGE, FINISHEDLIVINGAREA,PRICE,SALEYEAR,SALEDESC.x,CONDITION,FAIRMARKETTOTAL)
+
+```
+
+```{r}
+# Assuming your data frame is called df
+missing_data <- data.frame(Column = colnames(pgh), Missing_Percentage = NA)
+
+# Loop through each column and calculate the missing percentage
+for (i in 1:ncol(pgh)) {
+  missing_data$Missing_Percentage[i] <- sum(is.na(pgh[[i]])) / nrow(pgh) * 100
+}
+
+# View the result
+print(missing_data)
+```
+
+
+max_model<-lm(PRICE ~ PROPERTYZIP.x + LOTAREA + HOMESTEADFLAG + CLEANGREEN + 
+                FARMSTEADFLAG + ABATEMENTFLAG + STYLE + STORIES + YEARBLT + 
+                EXTERIORFINISH + BASEMENT + GRADE + CONDITION + TOTALROOMS + 
+                BEDROOMS + FULLBATHS + HALFBATHS + HEATINGCOOLING + FIREPLACES + 
+                BSMTGARAGE + FINISHEDLIVINGAREA, data = sampled_data)
+
+```
+
+set.seed(123)  # For reproducibility
+sampled_data <- pittsburgh_data[sample(1:nrow(pittsburgh_data), size = 0.01 * nrow(pittsburgh_data)), ]
+
+
+# Model selection
+# Use Forward and Backward Stepwise Regression Selection (AIC)
+
+max_model<-lm(PRICE ~ LOTAREA + HOMESTEADFLAG + CLEANGREEN + 
+                FARMSTEADFLAG + ABATEMENTFLAG + STYLE + STORIES + YEARBLT + 
+                EXTERIORFINISH + BASEMENT + GRADE + CONDITION + TOTALROOMS + 
+                BEDROOMS + FULLBATHS + HALFBATHS + HEATINGCOOLING + FIREPLACES + 
+                BSMTGARAGE + FINISHEDLIVINGAREA, data = sampled_data)
+
+min_model<- lm(PRICE~1, data=sampled_data)
+
+# Forward Stepwise Selection using stepAIC from MASS
+best_model <- stepAIC(min_model, direction = "forward", scope = list(lower = min_model, upper = max_model))
+
+# View the best model
+summary(best_model)
+```
+
