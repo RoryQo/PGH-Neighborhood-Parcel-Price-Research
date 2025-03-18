@@ -64,7 +64,7 @@ This dataset demarcates the zip code boundaries that lie within Allegheny County
 
 - **Extracting Sale Year**: The sale year was extracted from the `SALEDATE.x` column, which contains the full date. This year is then converted into a factor for use in analysis.
 
-- **Encoding Ratings**: The `GRADEDESC` column, which represents neighborhood ratings, was transformed into an ordered factor. This transformation ensures that the neighborhood ratings are treated as ordinal data in the statistical models. The ratings are ordered from "POOR" to "Highest Cost."
+- **Encoding Ratings**: The `GRADEDESC` column, which represents house ratings, was transformed into an ordered factor. This transformation ensures that the house ratings are treated as ordinal data in the statistical models. The ratings are ordered from "POOR" to "Highest Cost."
 
 ### Cleaned Data Availability
 
