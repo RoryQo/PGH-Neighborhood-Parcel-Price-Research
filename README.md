@@ -142,7 +142,56 @@ The **best model** is selected using a stepwise selection process. This function
 best_model = step(min_model, direction = "both", scope = max_model)
 ```
 
-### 3. Model Diagnostics
+
+#### d. Model Diagnostics
+
+
+<p align="center">
+  <img src="https://github.com/RoryQo/PGH-Neighborhood-Housing-Price-Analysis/blob/main/Figures/Diag.jpg?raw=true" width="500"/>
+</p>
+
+**Non-Linearity (Residuals vs Fitted Plot)**
+- Residuals show a pattern rather than being randomly scattered around zero.
+- Indicates that the model may be missing important non-linear relationships.
+  
+**Non-Normality of Residuals (Normal Q-Q Plot)**
+- The Q-Q plot shows heavy deviations in both tails.
+- Suggests the residuals are not normally distributed, which may impact hypothesis testing.
+
+
+**Heteroscedasticity (Scale-Location Plot)**
+- Residual spread is not uniform across fitted values.
+- Variance increases for certain values, violating homoscedasticity.
+
+
+**High-Leverage & Influential Points (Residuals vs Leverage Plot)**
+- Observations with high leverage are identified (e.g., 143203, 760650).
+- These points may disproportionately impact the model.
+
+
+
+
+### 4 Addressing Diagnostics
+
+
+#### Non-normality and Initial Transformations (Dependent Variables)
+
+To address non-normality in the regression, we will look at the distributions of the dependent numeric variables.
+
+
+
+```math
+\text{PRICE} = \beta_0 + \beta_1 \times \text{GRADEDESC} + \beta_2 \times \log(\text{FINISHEDLIVINGAREA} + 0.01) + 
+\beta_3 \times \text{SALEDESC.x} + \beta_4 \times \text{HEATINGCOOLING} + \beta_5 \times \text{STYLE} + 
+\beta_6 \times \text{FULLBATHS} + \beta_7 \times \log(\text{LOTAREA} + 0.01) + \beta_8 \times \text{HALFBATHS} + 
+\beta_9 \times \text{CONDITION} + \beta_{10} \times \text{FIREPLACES} + \beta_{11} \times \log(\text{TOTALROOMS} + 0.01) + 
+\beta_{12} \times \text{EXTERIORFINISH} + \beta_{13} \times (\text{SALEYEAR} - \text{YEARBLT}) + 
+\beta_{14} \times \text{BEDROOMS} + \beta_{15} \times \text{STORIES} + \beta_{16} \times \text{as.factor(PROPERTYZIP.x)} + 
+\beta_{17} \times \text{as.factor(SALEYEAR)} + \epsilon
+
+```
+
+
 
 <p align="center">
   <img src="https://github.com/RoryQo/PGH-Neighborhood-Housing-Price-Analysis/blob/main/Figures/Best_modelDiag.jpg?raw=true" width="500"/>
@@ -152,7 +201,6 @@ best_model = step(min_model, direction = "both", scope = max_model)
 - **Influential Points**: Cook's Distance is used to identify and remove highly influential points that might distort the model’s estimates.
 - **Heteroskedasticity**: The Breusch-Pagan test detected heteroskedasticity (non-constant variance of residuals). Robust standard errors are applied to correct for this issue.
 
-### 4 Adressing Diagnostics
 
 ```
 # 3. Check for multicollinearity using VIF
