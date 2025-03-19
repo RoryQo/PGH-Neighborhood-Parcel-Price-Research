@@ -1,11 +1,11 @@
 # Pittsburgh Housing Prices Modeling Project
 
-## Overview
+# Overview
 
 This project explores housing prices in Pittsburgh, with a focus on identifying factors that influence property values, such as property characteristics, neighborhood ratings, and sale year. We use a range of statistical techniques, including linear regression, weighted least squares (WLS), ANOVA, and ANCOVA, to understand trends and relationships in housing prices across different neighborhoods.
 
 
-## Data
+# Data
 
 The data used in this project is sourced from **Allegheny County**, and we also use additional data from the **Western Pennsylvania Regional Data Center (WPRDC)** for real estate sales and property assessments.
 
@@ -52,6 +52,7 @@ Boundaries of school districts in Pittsburgh. School quality plays a significant
 
 A dataset containing population figures for each ZIP code, used to understand how population density influences housing prices in Pittsburgh. Available in the final zipcounts data set in the data folder of the repo.
 
+# Regression and ANCOVA
 
 ### Data Cleaning & Preprocessing
 
@@ -315,7 +316,7 @@ This suggests that, although the price points differ across neighborhoods, the o
 | **Average Predicted Price Difference**            | $426965.34            |
 
 
-## Geo-Spatial Analysis
+# Geo-Spatial Analysis
 
 <p align="center">
     <img src="https://github.com/RoryQo/PGH-Neighborhood-Housing-Price-Analysis/blob/main/Figures/HousepriceG.png" alt="Housing Price Analysis" width=500px />
