@@ -84,15 +84,22 @@ The cleaned data is available for download in this repository. You can find the 
 
 ### 1. Exploratory Data Analysis (EDA)
 The initial steps involve exploring the data with summary statistics and visualizations to identify patterns and understand the structure of the data:
-- **Summary Statistics**: Basic descriptive statistics for the dataset are calculated.
-- **Price by ZIP Code**: The average housing prices per ZIP code are computed and visualized using a bar chart with error bars indicating the standard error of the mean.
 
 
+
+ ### &nbsp;&nbsp;&nbsp;&nbsp; Naïve Analysis: Price by ZIP Code
+
+In this **purely descriptive analysis**, the average housing prices per ZIP code are computed and visualized using a **bar chart**, with error bars representing the **standard error of the mean (SEM)** to illustrate price variability. However, this approach does **not account for confounding variables** such as property characteristics, neighborhood amenities, or market conditions. While useful for identifying broad trends, it does not provide a comprehensive understanding of the factors influencing housing prices.  
+
+This research seeks to go beyond this naïve analysis by employing **statistical modeling** to control for key variables and offer a more rigorous, data-driven assessment of housing price determinants.
 <p align="center">
   <img src="https://github.com/RoryQo/PGH-Neighborhood-Housing-Price-Analysis/blob/main/Figures/Unadj_Price_zip.jpg?raw=true" width=600px/>
 </p>
 
+<div align="center">
 
+**Descriptive Statistics**
+  
 | Statistic            | N       | Mean        | St. Dev.     | Min       | Max         |
 |----------------------|---------|-------------|--------------|-----------|-------------|
 | LOTAREA              | 146,470 | 8,215.283   | 23,225.260   | 0         | 2,337,386   |
@@ -111,6 +118,9 @@ The initial steps involve exploring the data with summary statistics and visuali
 | PRICE                | 146,470 | 184,973.500 | 270,583.300  | 0         | 10,662,000  |
 | SALEYEAR             | 146,470 | 2,018.022   | 3.658        | 2,012     | 2,025       |
 | FAIRMARKETTOTAL      | 146,470 | 139,303.800 | 0            | 2,793,400 |             |
+
+</div>
+
 
 
 ### 2. Linear Regression Models
@@ -225,15 +235,17 @@ df <- df[-high_influence, ]
 
 #### Investigate Multicolinearity
 
-```
-# 3. Check for multicollinearity using VIF
-vif_values <- vif(model)
-print(vif_values)
-```
+Multicollinearity occurs when independent variables in a regression model are highly correlated, leading to unstable coefficient estimates and inflated standard errors. To assess multicollinearity, we use the Generalized Variance Inflation Factor (GVIF), which extends the traditional VIF to categorical variables with multiple levels.
 
-#### GVIF and GVIF^(1/(2*Df)) for Variables
+Since GVIF depends on the degrees of freedom (Df) of a variable, we compute $GVIF^{\frac{1}{2Df}}$, which standardizes GVIF for easier interpretation. A value above 5 indicates high multicollinearity.
 
-| Variable                            | GVIF       | Df  | GVIF^(1/(2*Df)) |
+
+<div align="center">
+
+**$GVIF$ and $GVIF^{\frac{1}{2Df}}$ for Variables**
+
+  
+| $Variable$                          | $GVIF$       | $Df$  | $GVIF^{\frac{1}{2Df}}$ |
 |-------------------------------------|------------|-----|-----------------|
 | GRADEDESC                           | 1.839543   | 1   | 1.356298        |
 | log(FINISHEDLIVINGAREA + 0.001)     | 3.509536   | 1   | 1.873376        |
@@ -251,10 +263,15 @@ print(vif_values)
 | STORIES                              | 15.339543  | 10  | 1.146280        |
 | AGE                                  | 3.318723   | 1   | 1.821736        |
 
+</div>
 
+```
+# 3. Check for multicollinearity using VIF
+vif_values <- vif(model)
+print(vif_values)
+```
 
-
-#### Weighted Least Squares Approach
+### 5. Weighted Least Squares Approach
 
 By applying weights based on the fitted values from an initial model, WLS minimizes the influence of high-variance observations, providing more accurate estimates of the regression coefficients. In **OLS regression**, the ordinary least squares method minimizes the sum of squared residuals under the assumption that the variance of residuals is constant across all levels of the independent variables (homoscedasticity). However, when there is **heteroscedasticity** (non-constant variance of residuals), OLS estimates become inefficient, and the standard errors of the coefficients may be biased. 
 
@@ -270,7 +287,8 @@ w_i = \frac{1}{\sqrt{\hat{y}_i}}
 \text{LOG\_PRICE} = \beta_0 + \beta_1 \times \text{GRADEDESC} + \beta_2 \times \log(\text{FINISHEDLIVINGAREA} + 0.01) + \beta_3 \times \text{SALEDESC.x} + 
 \beta_4 \times \text{HEATINGCOOLING} + \beta_5 \times \text{STYLE} + \beta_6 \times \text{FULLBATHS} + \beta_7 \times \log(\text{LOTAREA} + 0.01) + 
 \beta_8 \times \text{HALFBATHS} + \beta_9 \times \text{CONDITION} + \beta_{10} \times \text{FIREPLACES} + \beta_{11} \times \log(\text{TOTALROOMS} + 0.01) + 
-\beta_{12} \times \text{EXTERIORFINISH} + \beta_{13} \times (\text{SALEYEAR} - \text{YEARBLT}) + \beta_{14} \times \text{BEDROOMS} + \beta_{15} \times \text{STORIES} + \epsilon
+\beta_{12} \times \text{EXTERIORFINISH} + \beta_{13} \times (\text{SALEYEAR} - \text{YEARBLT}) + \beta_{14} \times \text{BEDROOMS} + \beta_{15} \times \text{STORIES} + \beta_{16} \times \text{as.factor(PROPERTYZIP.x)} + 
+\beta_{17} \times \text{as.factor(SALEYEAR)} +  \epsilon
 ```
 
 #### Model Diagnostics
@@ -279,8 +297,8 @@ w_i = \frac{1}{\sqrt{\hat{y}_i}}
 <img src="https://github.com/RoryQo/PGH-Neighborhood-Housing-Price-Analysis/blob/main/Figures/1stdiag.jpg?raw=true" width=500px />
 </p>
 
-### 5. Box-Cox Transformation
-The **Box-Cox transformation** is applied to the dependent variable (`PRICE`) to identify an optimal transformation (lambda) that improves the model’s normality. The test revealed that the optimal value of \(\lambda\) was **2**. This suggests that applying a square transformation to the data (i.e., `PRICE^2`) would be the most effective. However, to handle the skewness effectively, we applied the **square root transformation** instead, which is a commonly used method for right-skewed data such as housing prices. we compared the square root version to the squared version, and the square root version diagnostic was significantly better than the squared. 
+### 6. Box-Cox Transformation
+The **Box-Cox transformation** is applied to the dependent variable (`PRICE`) to identify an optimal transformation (lambda) that improves the model’s normality. The test revealed that the optimal value of ($\lambda$) was **2**. This suggests that applying a square transformation to the data (i.e., `PRICE^2`) would be the most effective. However, to handle the skewness effectively, we applied the **square root transformation** instead, which is a commonly used method for right-skewed data such as housing prices. we compared the square root version to the squared version, and the square root version diagnostic was significantly better than the squared. 
 
 The general formula for the Box-Cox transformation is as follows:
 
@@ -298,6 +316,7 @@ The general formula for the Box-Cox transformation is as follows:
 ```
 
 #### Full Transformed Model
+
 ```math
 \text{PRICE\_transformed} = \beta_0 + \beta_1 \times \text{GRADEDESC} + \beta_2 \times \log(\text{FINISHEDLIVINGAREA} + 0.01) + 
 \beta_3 \times \text{SALEDESC.x} + \beta_4 \times \text{HEATINGCOOLING} + \beta_5 \times \text{STYLE} + 
@@ -313,9 +332,15 @@ The general formula for the Box-Cox transformation is as follows:
   <img src="https://github.com/RoryQo/PGH-Neighborhood-Housing-Price-Analysis/blob/main/Figures/3rddiag.jpg?raw=true" width=500px/>
 </p>
 
+### 6. Final Model
 
-### 6. Analysis of Covariance (ANCOVA)
-ANCOVA is performed to compare the mean prices of homes across different ZIP codes, adjusting for other variables in the model. The significance of sale year and zipcode tells us that there is significant variation in housing prices from these variables, controlling for all other property and land characteristics from our previous models. Moving forward, we will calculate adjusted means for both the transformed model and the wls model, since they are both incorrect, but are incorrect in opposite ways.  Taking them together can give us a more complete picture.
+Moving forward, we will proceed with both the **Weighted Least Squares (WLS) model** and the **Lambda-transformed model**. While neither approach is perfect, each provides unique strengths in capturing different segments of the housing market. The **Lambda-transformed model** better accounts for **lower-end housing prices**, while the **WLS model** more effectively captures **higher-end housing prices**. By comparing the results of both models and identifying consistent patterns, we can enhance the robustness of our analysis. Interpreting each model through the lens of its strengths allows us to achieve a **more comprehensive and reliable assessment** of housing prices in Pittsburgh.
+
+
+
+### 7. Analysis of Variance (ANOVA)
+
+ANCOVA is performed to compare the mean prices of homes across different ZIP codes, adjusting for other variables in the model. The significance of sale year and zip code tells us that there is significant variation in housing prices from these variables, controlling for all other property and land characteristics from our previous models. Moving forward, we will calculate adjusted means for both the transformed model and the wls model, to get a complete picture of Pricing patterns.
 
 #### ANOVA Table
 
@@ -326,10 +351,17 @@ ANCOVA is performed to compare the mean prices of homes across different ZIP cod
 | ...                                | ..   | ....   | ...     | .......   | .......   |
 | Residuals                          | 140620 | 185128 | 1       |           |           |
 
+```
+# Perform ANOVA to compare to see if zip and year still have a significant impact on House Prices Even After Accounting for Other Confounding Variables
+anova_results <- aov(model)
+
+# Display the ANCOVA table
+summary(anova_results)
+```
 
 
+### 8. Adjusted Means
 
-### 7. Adjusted Means
 Finally, **adjusted means** for the housing prices across ZIP codes are calculated, accounting for nuisance variables like `GRADEDESC`, `SALEDESC.x`, and `HEATINGCOOLING`. These adjusted means are visualized to identify which ZIP codes are the most and least expensive.
 
 #### Transformed Power Model
@@ -344,7 +376,7 @@ Finally, **adjusted means** for the housing prices across ZIP codes are calculat
 
 While the adjusted average housing prices across various Pittsburgh ZIP codes show clear trends, it is important to interpret the data with caution:
 
-**Overlapping Confidence Intervals:**
+**Overlapping Confidence Intervals**
 
 
 The overlapping error bars in the visualizations for the top and bottom ZIP codes indicate that, while the prices for these areas differ, the variation within these neighborhoods makes it difficult to confidently state that one ZIP code is definitively the most expensive or on the other hand the cheapest.
@@ -364,7 +396,7 @@ Despite the overlapping error within the groups of ZIP codes (highest price and 
 
 The adjusted average housing prices across various Pittsburgh ZIP codes reveal important insights into the housing market dynamics:
 
-**Parallel Trends Across ZIP Codes:**
+**Parallel Trends Across ZIP Codes**
 
 Both the top three highest and lowest ZIP codes in terms of housing prices, including 15232, 15217, 15222 (high-priced areas), and 15204, 15210, 15235 (lower-priced areas), show fairly parallel trends over time. Despite differences in their price levels, all these areas have experienced similar effects from broader market forces such as inflation and fluctuations in the housing market.
 Influence of Timing and Inflation:
