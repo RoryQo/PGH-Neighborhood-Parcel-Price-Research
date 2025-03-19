@@ -96,7 +96,22 @@ This research seeks to go beyond this naïve analysis by employing **statistical
   <img src="https://github.com/RoryQo/PGH-Neighborhood-Housing-Price-Analysis/blob/main/Figures/Unadj_Price_zip.jpg?raw=true" width=600px/>
 </p>
 
+```r
+# Calculate average price and standard error of the mean (SEM) for each ZIP code
+zipcode_summary <- pittsburgh_data %>%
+  group_by(PROPERTYZIP.x) %>%
+  summarise(
+    avg_price = mean(PRICE, na.rm = TRUE),
+    sem_price = sd(PRICE, na.rm = TRUE) / sqrt(n())  # Standard error of the mean
+  )
+
+# Create a plot with error bars for the average price by ZIP code
+ggplot(...)
+```
+
 <div align="center">
+
+
 
 **Descriptive Statistics**
   
@@ -149,7 +164,7 @@ The **best model** is selected using a stepwise selection process. This function
 ```
 <br><br>
 
-```
+```r
 best_model = step(min_model, direction = "both", scope = max_model)
 ```
 
@@ -228,7 +243,7 @@ D_i > \frac{4}{n - k - 1}
 ```
 
 
-```
+```r
 influence <- influence.measures(model)
 high_influence <- which(influence$infmat[, "cook.d"] > 4/(nrow(df)-length(model$coefficients)-2))
 df <- df[-high_influence, ]
@@ -266,7 +281,7 @@ Since GVIF depends on the degrees of freedom (Df) of a variable, we compute $GVI
 
 </div>
 
-```
+```r
 # 3. Check for multicollinearity using VIF
 vif_values <- vif(model)
 print(vif_values)
@@ -296,7 +311,7 @@ w_i = \frac{1}{\sqrt{\hat{y}_i}}
 
 <br>
 
-```
+```r
 lm(LOG_PRICE ~ ..., data = df, weights = 1 / sqrt(fitted(model)))
 ```
 
@@ -362,7 +377,7 @@ ANCOVA is performed to compare the mean prices of homes across different ZIP cod
 | ...                                | ..   | ....   | ...     | .......   | .......   |
 | Residuals                          | 140620 | 185128 | 1       |           |           |
 
-```
+```r
 # Perform ANOVA to compare to see if zip and year still have a significant impact on House Prices Even After Accounting for Other Confounding Variables
 anova_results <- aov(model)
 
@@ -398,7 +413,7 @@ The red line in the visualization represents the upper limit of the confidence i
 
 Despite the overlapping error within the groups of ZIP codes (highest price and lowest priced), we can confidently say that there is a significant difference in price when comparing the highest and lowest priced neighborhoods, holding all house and land features constant. The clear price gap between these groups indicates that the factors driving high prices in areas like 15232 are substantially different from those in areas like 15235, even after accounting for property features such as size, age, and condition.
 
-```
+```r
 grid <- ref_grid(model_transformed, nuisance = c("GRADEDESC", "SALEDESC.x", "HEATINGCOOLING", "STYLE", 
                                      "FULLBATHS", "CONDITION", "FIREPLACES", "EXTERIORFINISH",
                                      "BEDROOMS", "STORIES", "YEARBLT"))
@@ -437,6 +452,28 @@ adjusted_means_transformed <- emmeans(grid, ~ PROPERTYZIP.x * SALEYEAR)
 | **Average Predicted Price Difference**            | $426965.34            |
 
 </div>
+
+```python
+# Find the highest and lowest 'emmean' values
+max_emmean = df_cleaned['adjusted_price'].max()
+min_emmean = df_cleaned['adjusted_price'].min()
+
+# Calculate the difference between the highest and lowest 'emmean' values
+emmean_difference = max_emmean - min_emmean
+```
+
+```python
+# Find the rows with the highest and lowest 'emmean'
+max_emmean_row = df_cleaned.loc[df_cleaned['adjusted_price'] == max_emmean]
+min_emmean_row = df_cleaned.loc[df_cleaned['adjusted_price'] == min_emmean]
+
+# Get the lower_ci of the row with the lowest emmean and the upper_ci of the row with the highest emmean
+lower_ci_lower_emmean = min_emmean_row['lower_ci'].values[0]  # lower_ci of the lower emmean
+upper_ci_higher_emmean = max_emmean_row['upper_ci'].values[0]  # upper_ci of the higher emmean
+
+# Calculate the difference
+price_difference = upper_ci_higher_emmean - lower_ci_lower_emmean
+```
 
 ## Conclusion
 
