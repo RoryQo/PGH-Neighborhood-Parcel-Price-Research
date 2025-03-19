@@ -41,7 +41,16 @@ This dataset only contains information reported by City of Pittsburgh Police. It
 This dataset demarcates the zip code boundaries that lie within Allegheny County.If viewing this description on the Western Pennsylvania Regional Data Center’s open data portal, this dataset is harvested on a weekly basis from Allegheny County’s GIS data portal
 
 
+### School District Boundaries
 
+[![View Original Research Paper](https://img.shields.io/badge/School%20District%20Boundries%20Data-0056A0?style=flat&logo=external-link&logoColor=white&color=0056A0)](https://catalog.data.gov/dataset/allegheny-county-school-district-boundaries)
+
+
+Boundaries of school districts in Pittsburgh. School quality plays a significant role in determining the desirability of an area, and this dataset is used to examine how school district rankings impact housing prices.
+
+###  Population Data (Manually Compiled)
+
+A dataset containing population figures for each ZIP code, used to understand how population density influences housing prices in Pittsburgh. Available in the final zipcounts data set in the data folder of the repo.
 
 
 ### Data Cleaning & Preprocessing
@@ -316,23 +325,6 @@ This suggests that, although the price points differ across neighborhoods, the o
 ## Analyzing Factors Influencing Housing Prices in Pittsburgh ZIP Codes
 
 The aim of this analysis is to understand why certain ZIP codes in Pittsburgh have higher housing prices than others by analyzing factors such as **crime rates**, **school district quality**, and other socioeconomic factors. By combining spatial, demographic, and geographic data, this project provides a comprehensive analysis of the key drivers behind property value disparities across Pittsburgh.
-
-## Data Sources
-
-### 1. **Housing Price Data** (`ADJPrice.csv`)
-   - **Source**: Real estate listings and property data for Pittsburgh.
-   - **Details**: This dataset contains adjusted housing prices for properties in Pittsburgh, including ZIP codes and property features. This dataset helps map housing price trends geographically.
-
-### 2. **Crime Data** (`e03a89dd-134a-4ee8-a2bd-62c40aeebc6f.csv`)
-   - **Source**: Pittsburgh’s public crime reporting system.
-   - **Details**: Contains data on criminal incidents (arrests) in Pittsburgh, including coordinates of incidents. This data is used to calculate **arrest density**, which helps us understand the relationship between crime rates and housing prices.
-
-### 3. **Geospatial Data**:
-   - **ZIP Code Boundaries** (`zips.geojson`): Geographic boundaries of Pittsburgh ZIP codes, which are essential for visualizing housing prices geographically and merging them with crime and school district data.
-   - **School District Boundaries** (`alcogisallegheny-county-school-district-boundaries.geojson`): Boundaries of school districts in Pittsburgh. School quality plays a significant role in determining the desirability of an area, and this dataset is used to examine how school district rankings impact housing prices.
-
-### 4. **Population Data** (Manually Compiled)
-   - A dataset containing population figures for each ZIP code, used to understand how population density influences housing prices in Pittsburgh.
 
 ## Methodology
 
