@@ -147,7 +147,7 @@ best_model = step(min_model, direction = "both", scope = max_model)
 
 
 <p align="center">
-  <img src="https://github.com/RoryQo/PGH-Neighborhood-Housing-Price-Analysis/blob/main/Figures/Diag.jpg?raw=true" width="500"/>
+  <img src="https://github.com/RoryQo/PGH-Neighborhood-Housing-Price-Analysis/blob/main/Figures/Best_modelDiag.jpg?raw=true" width="500"/>
 </p>
 
 **Non-Linearity (Residuals vs Fitted Plot)**
@@ -174,14 +174,29 @@ best_model = step(min_model, direction = "both", scope = max_model)
 ### 4 Addressing Diagnostics
 
 
-#### Non-normality and Initial Transformations (Dependent Variables)
+#### Non-normality and Initial Transformations 
 
-To address non-normality in the regression, we will look at the distributions of the dependent numeric variables.
+**Dependent Variables**
 
+To address non-normality in the regression, we first examine the distributions of the dependent variables. Numeric variable distributions are represented in blue, while categorical variables are shown in orange. Variables exhibiting non-normality typically display right skewness. To mitigate this, we will apply a logarithmic transformation to these variables in an effort to normalize their distributions and improve the model’s assumptions.
+
+<p align="center">
+  <img src="https://github.com/RoryQo/PGH-Neighborhood-Housing-Price-Analysis/blob/main/Figures/Dist1.png?raw=true" width="500"/>
+  <img src="https://github.com/RoryQo/PGH-Neighborhood-Housing-Price-Analysis/blob/main/Figures/Dist2.png?raw=true" width="500"/>
+</p>
+
+
+**Independent Variable**
+
+In regression analysis, it is common to apply a logarithmic transformation to price because price data often follow a skewed distribution, with a few extreme values pulling the distribution to the right. This can violate the assumption of normality, which is important for many statistical tests and models. The logarithmic transformation helps to compress the scale of high values, making the distribution more symmetric and closer to normal. This also helps stabilize the variance and reduce the influence of outliers, leading to more reliable regression results. Additionally, applying a log transformation often interprets coefficients more meaningfully, as changes in the log-transformed variable can be interpreted in terms of percentage changes rather than absolute changes.
+
+<p align="center">
+  <img src="https://github.com/RoryQo/PGH-Neighborhood-Housing-Price-Analysis/blob/main/Figures/D3.png?raw=true" width="500"/>
+</p>
 
 
 ```math
-\text{PRICE} = \beta_0 + \beta_1 \times \text{GRADEDESC} + \beta_2 \times \log(\text{FINISHEDLIVINGAREA} + 0.01) + 
+\log(\text{PRICE}) = \beta_0 + \beta_1 \times \text{GRADEDESC} + \beta_2 \times \log(\text{FINISHEDLIVINGAREA} + 0.01) + 
 \beta_3 \times \text{SALEDESC.x} + \beta_4 \times \text{HEATINGCOOLING} + \beta_5 \times \text{STYLE} + 
 \beta_6 \times \text{FULLBATHS} + \beta_7 \times \log(\text{LOTAREA} + 0.01) + \beta_8 \times \text{HALFBATHS} + 
 \beta_9 \times \text{CONDITION} + \beta_{10} \times \text{FIREPLACES} + \beta_{11} \times \log(\text{TOTALROOMS} + 0.01) + 
@@ -191,16 +206,24 @@ To address non-normality in the regression, we will look at the distributions of
 
 ```
 
+#### High-Leverage & Influential Points
+
+High leverage points can distort regression estimates, reduce accuracy, and violate key assumptions by skewing coefficients, lead to heteroscedasticity, non-normal residuals, and misleading p-values. Removing these points ensures a more robust, reliable, and generalizable model. Using diagnostics like Cook’s Distance, we can identify and exclude them for a more stable and meaningful housing price analysis. From the Residuals vs. Leverage plot, we identified the following influential data points with high Cook’s Distance: 306, 3722, 12370.
+
+The threshold used for identifying influential observations is:
+
+```math
+D_i > \frac{4}{n - k - 1}
+```
 
 
-<p align="center">
-  <img src="https://github.com/RoryQo/PGH-Neighborhood-Housing-Price-Analysis/blob/main/Figures/Best_modelDiag.jpg?raw=true" width="500"/>
-</p>
+```
+influence <- influence.measures(model)
+high_influence <- which(influence$infmat[, "cook.d"] > 4/(nrow(df)-length(model$coefficients)-2))
+df <- df[-high_influence, ]
+```
 
-- **Multicollinearity**: The variance inflation factor (VIF) is calculated to check for multicollinearity among the predictors. A VIF value greater than 10 indicates high collinearity.
-- **Influential Points**: Cook's Distance is used to identify and remove highly influential points that might distort the model’s estimates.
-- **Heteroskedasticity**: The Breusch-Pagan test detected heteroskedasticity (non-constant variance of residuals). Robust standard errors are applied to correct for this issue.
-
+#### Investigate Multicolinearity
 
 ```
 # 3. Check for multicollinearity using VIF
@@ -230,13 +253,6 @@ print(vif_values)
 
 
 
-#### Identify and remove influential points based on Cook’s Distance
-
-```
-influence <- influence.measures(model)
-high_influence <- which(influence$infmat[, "cook.d"] > 4/(nrow(df)-length(model$coefficients)-2))
-df <- df[-high_influence, ]
-```
 
 #### Weighted Least Squares Approach
 
