@@ -147,6 +147,7 @@ The **best model** is selected using a stepwise selection process. This function
 ```math
 \text{PRICE} = \beta_0 + \beta_1 \cdot \text{GRADEDESC} + \beta_2 \cdot \text{FINISHEDLIVINGAREA} + \beta_3 \cdot \text{SALEDESC.x} + \beta_4 \cdot \text{SALEYEAR} + \beta_5 \cdot \text{HEATINGCOOLING} + \beta_6 \cdot \text{STYLE} + \beta_7 \cdot \text{FULLBATHS} + \beta_8 \cdot \text{LOTAREA} + \beta_9 \cdot \text{HALFBATHS} + \beta_{10} \cdot \text{CONDITION} + \beta_{11} \cdot \text{FIREPLACES} + \beta_{12} \cdot \text{TOTALROOMS} + \beta_{13} \cdot \text{EXTERIORFINISH} + \beta_{14} \cdot \text{YEARBLT} + \beta_{15} \cdot \text{BEDROOMS} + \beta_{16} \cdot \text{STORIES} + \epsilon
 ```
+<br><br>
 
 ```
 best_model = step(min_model, direction = "both", scope = max_model)
@@ -283,6 +284,8 @@ The weights are computed as the inverse of the fitted values from an initial **O
 w_i = \frac{1}{\sqrt{\hat{y}_i}}
 ```
 
+**Full Model**
+
 ```math
 \text{LOG\_PRICE} = \beta_0 + \beta_1 \times \text{GRADEDESC} + \beta_2 \times \log(\text{FINISHEDLIVINGAREA} + 0.01) + \beta_3 \times \text{SALEDESC.x} + 
 \beta_4 \times \text{HEATINGCOOLING} + \beta_5 \times \text{STYLE} + \beta_6 \times \text{FULLBATHS} + \beta_7 \times \log(\text{LOTAREA} + 0.01) + 
@@ -290,6 +293,14 @@ w_i = \frac{1}{\sqrt{\hat{y}_i}}
 \beta_{12} \times \text{EXTERIORFINISH} + \beta_{13} \times (\text{SALEYEAR} - \text{YEARBLT}) + \beta_{14} \times \text{BEDROOMS} + \beta_{15} \times \text{STORIES} + \beta_{16} \times \text{as.factor(PROPERTYZIP.x)} + 
 \beta_{17} \times \text{as.factor(SALEYEAR)} +  \epsilon
 ```
+
+<br>
+
+```
+lm(LOG_PRICE ~ ..., data = df, weights = 1 / sqrt(fitted(model)))
+```
+
+
 
 #### Model Diagnostics
 
@@ -387,6 +398,14 @@ The red line in the visualization represents the upper limit of the confidence i
 
 Despite the overlapping error within the groups of ZIP codes (highest price and lowest priced), we can confidently say that there is a significant difference in price when comparing the highest and lowest priced neighborhoods, holding all house and land features constant. The clear price gap between these groups indicates that the factors driving high prices in areas like 15232 are substantially different from those in areas like 15235, even after accounting for property features such as size, age, and condition.
 
+```
+grid <- ref_grid(model_transformed, nuisance = c("GRADEDESC", "SALEDESC.x", "HEATINGCOOLING", "STYLE", 
+                                     "FULLBATHS", "CONDITION", "FIREPLACES", "EXTERIORFINISH",
+                                     "BEDROOMS", "STORIES", "YEARBLT"))
+
+adjusted_means_transformed <- emmeans(grid, ~ PROPERTYZIP.x)
+```
+
 ## Viewing Adjusted Mean Trends Through Time
 
 ####  WLS Model
@@ -403,14 +422,31 @@ Influence of Timing and Inflation:
 
 This suggests that, although the price points differ across neighborhoods, the overall trend of increasing housing prices (with occasional fluctuations) has been a common experience for both high-end and more affordable areas. This trend reflects a generalized market shift rather than isolated changes in individual neighborhoods.
 
+```
+adjusted_means_transformed <- emmeans(grid, ~ PROPERTYZIP.x * SALEYEAR)
+```
+  
 ## Price Difference Between Most Expensive and Least Expensive ZIP Codes
 
+<div align="center">
+  
 | Metric                                             | Value                |
 |----------------------------------------------------|----------------------|
 | **Max CI Difference**  | $426965.34            |
 | **Min CI Difference**  | $170959.97            |
 | **Average Predicted Price Difference**            | $426965.34            |
 
+</div>
+
+## Conclusion
+
+The estimated price difference between the **most expensive** and **least expensive** ZIP codes in Pittsburgh is **$298,940.92**, with a **confidence interval** ranging from **$170,959.96 to $426,965.34**. This significant disparity highlights the substantial variation in housing prices across different areas.  
+
+The **most expensive ZIP codes** include **15232, 15217, 15222, 15201, and 15213**, indicating neighborhoods with higher market valuations. In contrast, the **least expensive ZIP codes**, such as **15235, 15210, 15204, 15221, and 15214**, reflect areas with lower housing prices.  
+
+This estimated difference **holds all house characteristics constant**, meaning it represents the price change if the **same house** were hypothetically moved from one ZIP code to another. In other words, if you took a house from an inexpensive ZIP code and placed it in an expensive ZIP code, this is the price difference we would expect to see, **purely based on location**.  
+
+While this analysis provides insight into price variation across ZIP codes, it does not yet explain **why** these differences exist. Moving forward, we will analyze **geospatial data** to explore the underlying factors driving these disparities, such as **crime rates and school quality**. Combining **Adjusted Mean Data** (from our above analysis) with geospatial data to allow us to develop a more comprehensive understanding of the forces shaping Pittsburgh’s housing market.
 
 # Geo-Spatial Analysis
 
