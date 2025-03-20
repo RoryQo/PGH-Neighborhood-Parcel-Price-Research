@@ -1,4 +1,4 @@
-# Pittsburgh Housing Prices Modeling Project
+<h1 align="center">Pittsburgh Housing Prices Modeling</h1>
 
 # Overview
 
@@ -50,6 +50,9 @@ Boundaries of school districts in Pittsburgh. School quality plays a significant
 
 ###  Population Data (Manually Compiled)
 
+[![View Dataset](https://img.shields.io/badge/View%20Dataset-0056A0?style=flat&logo=github)](https://github.com/RoryQo/PGH-Neighborhood-Housing-Price-Analysis/blob/main/Data/zipcode_counts.csv)
+
+
 A dataset containing population figures for each ZIP code, used to understand how population density influences housing prices in Pittsburgh. Available in the final zipcounts data set in the data folder of the repo.
 
 # Regression and ANCOVA
@@ -62,13 +65,28 @@ A dataset containing population figures for each ZIP code, used to understand ho
 
 - **Missing Values**: Approximately 20% of the 90,000 observations had missing data. After inspection, these missing values were determined to be random, so they were dropped. We retained enough remaining observations for meaningful analysis.
 
-- **Sale Descriptions**: The sale descriptions labeled as "love and affection" were removed because they were associated with very low sale prices that did not reflect accurate market values. Upon inspection, the rate of these sales was stable across ZIP codes, so they were deemed to distort the overall analysis. 
+|   PROPERTYZIP.x |   LOTAREA |   STYLE |   STORIES |   YEARBLT |   EXTERIORFINISH |   BASEMENT |   GRADEDESC |   CONDITION |   TOTALROOMS |   BEDROOMS |   FULLBATHS |   HALFBATHS |   HEATINGCOOLING |   FIREPLACES |   BSMTGARAGE |   FINISHEDLIVINGAREA |    PRICE |   SALEYEAR |   SALEDESC.x |   FAIRMARKETTOTAL |
+|----------------:|----------:|--------:|----------:|----------:|-----------------:|-----------:|------------:|------------:|-------------:|-----------:|------------:|------------:|-----------------:|-------------:|-------------:|---------------------:|---------:|-----------:|-------------:|------------------:|
+|               0 |         0 | 16.8587 |   16.8633 |   16.8561 |          16.8602 |    16.8786 |     16.8633 |     16.8725 |      16.8756 |    16.8684 |      16.872 |     17.8816 |          16.8904 |      23.9331 |      20.9421 |              16.8561 | 0.304161 |          0 |            0 |                 0 |
+
+- **Sale Descriptions**: The sale descriptions labeled as "love and affection" were removed because they were associated with very low sale prices that did not reflect accurate market values. Upon inspection, the rate of these sales was stable across ZIP codes, so they were deemed to distort the overall analysis.
+
+<p align="center">
+<img src="https://github.com/RoryQo/PGH-Neighborhood-Housing-Price-Analysis/blob/main/Figures/missL.jpg?raw=true" width=400px/>
+</p>
 
 - **Other Sale Descriptions**: Other sale descriptions, such as bank repossessions, could lead to lower sale prices. However, these are not equally distributed across ZIP codes and show an underlying pattern in the data. Since they provide valuable insights into the market, these observations were retained in the dataset.
 
 - **Zipcodes**: Zipcodes needed to have enough observations to get a valid comparison and average price, 4 zipcodes were dropped because they had many less observations than the others (< 220)
-  
-- **Interaction Grid**: Before building the max model and adjusting means we must check for interaction terms, a grid of scatter plots showing all possible interactions was created. **No interaction terms were significant**, and therefore not included in maximum model.
+
+```python
+# Count the number of observations per ZIP code
+zip_counts = df["Zip"].value_counts().reset_index()
+zip_counts.columns = ["Zip", "Observations"]  # Rename columns
+
+# Filter ZIP codes with at least 250 observations
+filtered_zip_df = zip_counts[zip_counts["Observations"] >= 250]
+```
 
 ### Data Transformation
 
