@@ -76,6 +76,8 @@ A dataset containing population figures for each ZIP code, used to understand ho
 
 - **Encoding Ratings**: The `GRADEDESC` column, which represents house ratings, was transformed into an ordered factor. This transformation ensures that the house ratings are treated as ordinal data in the statistical models. The ratings are ordered from "POOR" to "Highest Cost."
 
+- - **Create Age of House Variable:** Subtract Year built from sale year
+
 ```r
 # Define the desired order of levels
 rating_levels <- c("POOR", "POOR -", "POOR +", "BELOW AVERAGE", "BELOW AVERAGE -", "BELOW AVERAGE +", "AVERAGE", "AVERAGE -", "AVERAGE +", "GOOD", "GOOD -", "GOOD +", "VERY GOOD", "VERY GOOD -", "VERY GOOD +", "EXCELLENT", "EXCELLENT -", "EXCELLENT +", "Highest Cost", "Highest Cost -", "Highest Cost +")
@@ -86,7 +88,7 @@ df$GRADEDESC <- factor(df$GRADEDESC, levels = rating_levels, ordered = TRUE)
 df$GRADEDESC <- as.numeric(df$GRADEDESC)
 ```
 
-- **Create Age of House Variable:** Subtract Year built from sale year
+
 
 ### Cleaned Data Availability
 
