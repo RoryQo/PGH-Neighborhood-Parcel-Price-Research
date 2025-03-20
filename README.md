@@ -471,7 +471,7 @@ The adjusted average housing prices across various Pittsburgh ZIP codes reveal i
 Both the top three highest and lowest ZIP codes in terms of housing prices, including 15232, 15217, 15222 (high-priced areas), and 15204, 15210, 15235 (lower-priced areas), show fairly parallel trends over time. Despite differences in their price levels, all these areas have experienced similar effects from broader market forces such as inflation and fluctuations in the housing market.
 Influence of Timing and Inflation:
 
-This suggests that, although the price points differ across neighborhoods, the overall trend of increasing housing prices (with occasional fluctuations) has been a common experience for both high-end and more affordable areas. This trend reflects a generalized market shift rather than isolated changes in individual neighborhoods.
+This suggests that, although the price points differ across neighborhoods, the overall trend of increasing housing prices (with occasional fluctuations) has been a common experience for both high-end and more affordable areas. This trend reflects a generalized market shift rather than isolated changes in individual neighborhoods. Seeing this parallel trend validates our previous adjusted means because regardless of the adjusted mean year held constant, the ranking remains the same.
 
 ```
 adjusted_means_transformed <- emmeans(grid, ~ PROPERTYZIP.x * SALEYEAR)
@@ -519,13 +519,12 @@ The **most expensive ZIP codes** include **15232, 15217, 15222, 15201, and 15213
 
 This estimated difference **holds all house characteristics constant**, meaning it represents the price change if the **same house** were hypothetically moved from one ZIP code to another. In other words, if you took a house from an inexpensive ZIP code and placed it in an expensive ZIP code, this is the price difference we would expect to see, **purely based on location**.  
 
+Both the highest- and lowest-priced ZIP codes have followed parallel trends over time. This suggests that housing prices across Pittsburgh, regardless of their starting points, have been shaped by overarching market forces rather than isolated neighborhood-specific changes. Furthermore, this parallel trend reinforces the validity of our adjusted mean estimates, as the ranking of ZIP codes remains consistent regardless of the adjustment year.
+
 While this analysis provides insight into price variation across ZIP codes, it does not yet explain **why** these differences exist. Moving forward, we will analyze **geospatial data** to explore the underlying factors driving these disparities, such as **crime rates and school quality**. Combining **Adjusted Mean Data** (from our above analysis) with geospatial data to allow us to develop a more comprehensive understanding of the forces shaping Pittsburgh’s housing market.
 
 # Geo-Spatial Analysis
 
-<p align="center">
-    <img src="https://github.com/RoryQo/PGH-Neighborhood-Housing-Price-Analysis/blob/main/Figures/HousepriceG.png" alt="Housing Price Analysis" width=500px />
-</p>
 
 
 ## Analyzing Factors Influencing Housing Prices in Pittsburgh ZIP Codes
@@ -543,19 +542,58 @@ The analysis requires integrating data from various sources with different struc
 3. **School District Data Integration**: Using fuzzy matching, align the **school district rankings** to the corresponding **ZIP codes**.
 4. **Population Data Merge**: Merge population data with arrest counts to normalize arrest density by population, allowing for a more accurate comparison of crime rates across neighborhoods.
 
+### Visualizing Adjusting Housing Prices Spatially
+
+
+
+#### Steps for Spatial Visualization:
+
+1. **Merge Housing Prices with ZIP Codes**: Merge the `zipcode_avg_price` dataset (from the above eemaean analysis) with the `zips` GeoDataFrame to analyze how prices vary geographically. Be sure to treat the zip code column of each data frame as an integer to ensure a proper merge.
+
+```python
+# Step 3: Merge the GeoDataFrame with the price data (based on ZIP code)
+zips_with_prices = zips.merge(zipcode_avg_price, left_on='ZIP', right_on='PROPERTYZIP.x')
+```
+   
+2. **Check Coordinate Type**: Check the coordinate format of the geojson provided by Allegheny County. We will need to ensure compatibility with other geojsons and to understand possible distortions when viewing the zip code area. The coordinate system in this file is `crs="EPSG:4326"`
+
+
+<p align="center">
+    <img src="https://github.com/RoryQo/PGH-Neighborhood-Housing-Price-Analysis/blob/main/Figures/HousepriceG.png" alt="Housing Price Analysis" width=500px />
+</p>
+
 ### Crime Data Analysis
 
 #### Crime Data and Its Importance
 
-Crime is often a significant factor affecting property values. Areas with higher crime rates typically see lower property values due to concerns over safety. **Crime data** in this project comes from Pittsburgh’s public crime reporting system, which provides details on incidents, including arrests, and the locations (latitude and longitude) of these events.
+Crime is often a significant factor affecting property values. Areas with higher crime rates typically see lower property values due to safety concerns. **Crime data** in this project comes from Pittsburgh’s public crime reporting system, which provides details on incidents, including arrests, and the locations (latitude and longitude) of these events.
 
 #### Steps for Crime Data Integration:
 
 1. **Geo-spatial Join**: Crime data, which contains coordinates for each incident, is joined with the **ZIP code boundaries** using **GeoPandas**. This spatial join links each crime incident to a specific ZIP code.
-   
-2. **Arrest Density Calculation**: The number of arrests in each ZIP code is divided by the area of the ZIP code to calculate **arrest density**—the number of arrests per square meter. High arrest density in a ZIP code typically correlates with lower property values, which is expected based on general urban real estate trends.
 
-3. **Crime Rate and Housing Prices**: Once the arrest density is calculated, it is merged with the **housing price data**. This allows us to explore how areas with higher crime rates (higher arrest density) correlate with lower property values.
+```python
+# Step 3: Convert the DataFrame to a GeoDataFrame
+gdf = gpd.GeoDataFrame(df, geometry=gpd.points_from_xy(df['X'], df['Y']), crs="EPSG:4326")
+
+# Ensure Compatability
+zipcodes_gdf = zipcodes_gdf.set_crs("EPSG:4326")
+```
+   
+2. **Arrest Density Calculation**: The number of arrests in each ZIP code is divided by the population of the ZIP code to calculate **arrest density**—the number of arrests per square meter. High arrest density in a ZIP code typically correlates with lower property values, which is expected based on general urban real estate trends.
+
+3. **Crime Rate and Housing Prices**: Once the arrest density is calculated, it is merged with the **Adjusted Housing price data**. This allows us to explore how areas with higher crime rates (higher arrest density) correlate with lower property values.
+
+```python
+# Step 5: Perform a spatial join to assign ZIP codes to incident features
+incidents_with_zip = gpd.sjoin(gdf, zipcodes_gdf, how="left", predicate="intersects")
+
+# Step 6: Count the number of incidents (arrests) per ZIP code
+zipcode_counts = incidents_with_zip.groupby('ZIP').agg(num_incidents=('ARRESTLOCATION', 'count')).reset_index()
+
+# Step 7: Merge the ZIP code boundary GeoDataFrame with the incident count data
+zips_with_incidents = zipcodes_gdf.merge(zipcode_counts, left_on='ZIP', right_on='ZIP', how='left')
+```
 
 
 <p align="center">
@@ -576,7 +614,21 @@ The quality of local schools is often a significant factor in determining real e
 #### Steps for School District Data Integration:
 
 1. **Fuzzy Matching**: Because the names of school districts in the external dataset may not exactly match those in the ZIP code data, fuzzy matching techniques were used to align school district names to the correct ZIP codes.
-   
+
+```python
+def fuzzy_match(row, choices, threshold=80):
+    match = process.extractOne(row, choices, scorer=fuzz.partial_ratio)
+    if match and match[1] >= threshold:
+        return match[0]
+    return None
+
+# Extract the school district names from the df DataFrame for matching
+df_school_districts = df['School District'].tolist()
+
+# Perform fuzzy matching on the 'SCHOOLD' column of zip_school_join
+zip_school_join['Matched School District'] = zip_school_join['SCHOOLD'].apply(
+    fuzzy_match, args=(df_school_districts, 80))
+``` 
 2. **Merging School District Boundaries**: After the fuzzy matching, the **school district boundaries** were merged with the **ZIP codes** to associate each ZIP code with its corresponding school district.
 
 <p align="center">
@@ -585,7 +637,16 @@ The quality of local schools is often a significant factor in determining real e
 
 3. **School District Rankings**: School district rankings were then linked to each ZIP code. Since the zipcodes and school district lines do not perfectly match up we average the rank of each school within the zipcode. A higher ranking (indicating a better-performing school district) is associated with a higher price for homes in that ZIP code, as families often prioritize access to quality education.
 
+ ```python
+# Group by 'ZIP' and calculate the average rank for each ZIP code
+zip_avg_rank = merged_df.groupby('ZIP')['Rank'].mean().reset_index()
+```
+
 4. **Rank Inversion**: To ensure better clarity in interpretation, the school district ranking values were inverted, so that a higher value represented a better-ranked school district.
+
+```python
+zip_avg_rank['Inverted Rank'] = max_rank - zip_avg_rank['Rank'] + 1
+```
 
 
 <p align="center">
