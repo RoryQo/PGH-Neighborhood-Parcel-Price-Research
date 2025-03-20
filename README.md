@@ -1,5 +1,54 @@
 <h1 align="center">Pittsburgh Housing Prices Modeling</h1>
 
+
+  
+<table align="center">
+  <tr>
+    <td colspan="2" align="center" style="background-color: white; color: black;"><strong>Table of Contents</strong></td>
+  </tr>
+  <tr>
+    <td style="background-color: white; color: black; padding: 10px;">
+      1. <a href="#overview" style="color: black;">Overview</a>
+    </td>
+    <td style="background-color: gray; color: black; padding: 10px;">
+      2. <a href="#data" style="color: black;">Data</a>
+    </td>
+  </tr>
+  <tr>
+    <td style="background-color: gray; color: black; padding: 10px;">
+      3. <a href="#regression-and-ancova" style="color: black;">Regression and ANCOVA</a><br>
+      &nbsp;&nbsp;&nbsp;- <a href="#1-exploratory-data-analysis-eda" style="color: black;">Exploratory Data Analysis (EDA)</a><br>
+      &nbsp;&nbsp;&nbsp;- <a href="#2-linear-regression-models" style="color: black;">Linear Regression Models</a><br>
+      &nbsp;&nbsp;&nbsp;- <a href="#3-addressing-diagnostics" style="color: black;">Addressing Diagnostics</a><br>
+      &nbsp;&nbsp;&nbsp;- <a href="#4-weighted-least-squares-approach" style="color: black;">Weighted Least Squares Approach</a><br>
+      &nbsp;&nbsp;&nbsp;- <a href="#5-box-cox-transformation" style="color: black;">Box-Cox Transformation</a><br>
+      &nbsp;&nbsp;&nbsp;- <a href="#6-final-model" style="color: black;">Final Model</a><br>
+      &nbsp;&nbsp;&nbsp;- <a href="#7-analysis-of-variance-anova" style="color: black;">Analysis of Variance (ANOVA)</a><br>
+      &nbsp;&nbsp;&nbsp;- <a href="#8-adjusted-means" style="color: black;">Adjusted Means</a><br>
+      &nbsp;&nbsp;&nbsp;- <a href="#conclusion" style="color: black;">Conclusion</a>
+    </td>
+    <td style="background-color: white; color: black; padding: 10px;">
+      4. <a href="#geo-spatial-analysis" style="color: black;">Geo-Spatial Analysis</a><br>
+      &nbsp;&nbsp;&nbsp;- <a href="#analyzing-factors-influencing-housing-prices-in-pittsburgh-zip-codes" style="color: black;">Analyzing Factors Influencing Housing Prices</a><br>
+      &nbsp;&nbsp;&nbsp;- <a href="#methodology" style="color: black;">Methodology</a><br>
+      &nbsp;&nbsp;&nbsp;- <a href="#crime-data-analysis" style="color: black;">Crime Data Analysis</a><br>
+      &nbsp;&nbsp;&nbsp;- <a href="#school-district-data-analysis" style="color: black;">School District Data Analysis</a><br>
+      &nbsp;&nbsp;&nbsp;- <a href="#geographic-trends" style="color: black;">Geographic Trends</a>
+    </td>
+  </tr>
+  <tr>
+    <td style="background-color: gray; color: black; padding: 10px;">
+      5. <a href="#appendix-simple-alternative-analysis-approach" style="color: black;">Appendix: Alternative Analysis Approach</a>
+    </td>
+    <td style="background-color: white; color: black; padding: 10px;">
+      6. <a href="#libraries-used" style="color: black;">Usage and Requirements</a>
+    </td>
+  </tr>
+</table>
+
+
+
+
 # Overview
 
 This project explores housing prices in Pittsburgh, with a focus on identifying factors that influence property values, such as property characteristics, neighborhood ratings, and sale year. We use a range of statistical techniques, including linear regression, weighted least squares (WLS), ANOVA, and ANCOVA, to understand trends and relationships in housing prices across different neighborhoods.
@@ -233,7 +282,7 @@ best_model = step(min_model, direction = "both", scope = max_model)
 
 
 
-### 4 Addressing Diagnostics
+### 3. Addressing Diagnostics
 
 
 #### Non-normality and Initial Transformations 
@@ -323,7 +372,7 @@ vif_values <- vif(model)
 print(vif_values)
 ```
 
-### 5. Weighted Least Squares Approach
+### 4. Weighted Least Squares Approach
 
 By applying weights based on the fitted values from an initial model, WLS minimizes the influence of high-variance observations, providing more accurate estimates of the regression coefficients. In **OLS regression**, the ordinary least squares method minimizes the sum of squared residuals under the assumption that the variance of residuals is constant across all levels of the independent variables (homoscedasticity). However, when there is **heteroscedasticity** (non-constant variance of residuals), OLS estimates become inefficient, and the standard errors of the coefficients may be biased. 
 
@@ -359,7 +408,7 @@ lm(LOG_PRICE ~ ..., data = df, weights = 1 / sqrt(fitted(model)))
 <img src="https://github.com/RoryQo/PGH-Neighborhood-Housing-Price-Analysis/blob/main/Figures/1stdiag.jpg?raw=true" width=500px />
 </p>
 
-### 6. Box-Cox Transformation
+### 5. Box-Cox Transformation
 The **Box-Cox transformation** is applied to the dependent variable (`PRICE`) to identify an optimal transformation (lambda) that improves the model’s normality. The test revealed that the optimal value of ($\lambda$) was **2**. This suggests that applying a square transformation to the data (i.e., `PRICE^2`) would be the most effective. However, to handle the skewness effectively, we applied the **square root transformation** instead, which is a commonly used method for right-skewed data such as housing prices. we compared the square root version to the squared version, and the square root version diagnostic was significantly better than the squared. 
 
 The general formula for the Box-Cox transformation is as follows:
