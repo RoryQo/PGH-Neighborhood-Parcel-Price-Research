@@ -112,6 +112,10 @@ df$GRADEDESC <- as.numeric(df$GRADEDESC)
 
 The cleaned data is available for download in this repository. You can find the file under the "data" folder or in the relevant section of this project.
 
+[![View Dataset](https://img.shields.io/badge/View%20Dataset-0056A0?style=flat&logo=github)](https://github.com/RoryQo/PGH-Neighborhood-Housing-Price-Analysis/blob/main/Data/pgh_Dropped.csv)
+
+
+
 ## Statistical Models and Analysis
 
 ### 1. Exploratory Data Analysis (EDA)
@@ -511,7 +515,7 @@ price_difference = upper_ci_higher_emmean - lower_ci_lower_emmean
 
 The estimated price difference between the **most expensive** and **least expensive** ZIP codes in Pittsburgh is **$298,940.92**, with a **confidence interval** ranging from **$170,959.96 to $426,965.34**. This significant disparity highlights the substantial variation in housing prices across different areas.  
 
-The **most expensive ZIP codes** include **15232, 15217, 15222, 15201, and 15213**, indicating neighborhoods with higher market valuations. In contrast, the **least expensive ZIP codes**, such as **15235, 15210, 15204, 15221, and 15214**, reflect areas with lower housing prices.  
+The **most expensive ZIP codes** include **15232, 15217, 15222, 15201, and 15213**, indicating neighborhoods with higher market valuations. In contrast, the **least expensive ZIP codes**, such as **15235, 15210, 15204, 15221, and 15214**, reflect areas with lower housing prices. While there is a significant difference between the low house price zip codes and the high house price zip codes, the top 3-5 of each respective group's confidence intervals overlap so much that we can not identify a most or least expensive zip code with confidence.
 
 This estimated difference **holds all house characteristics constant**, meaning it represents the price change if the **same house** were hypothetically moved from one ZIP code to another. In other words, if you took a house from an inexpensive ZIP code and placed it in an expensive ZIP code, this is the price difference we would expect to see, **purely based on location**.  
 
