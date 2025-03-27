@@ -1,4 +1,4 @@
-<h1 align="center">Pittsburgh Housing Prices Modeling</h1>
+<h1 align="center">Pittsburgh Parcel Prices Modeling</h1>
 
 
   
@@ -29,7 +29,7 @@
     </td>
     <td style="background-color: white; color: black; padding: 10px;">
       4. <a href="#geo-spatial-analysis" style="color: black;">Geo-Spatial Analysis</a><br>
-      &nbsp;&nbsp;&nbsp;- <a href="#analyzing-factors-influencing-housing-prices-in-pittsburgh-zip-codes" style="color: black;">Analyzing Factors Influencing Housing Prices</a><br>
+      &nbsp;&nbsp;&nbsp;- <a href="#analyzing-factors-influencing-parcel-prices-in-pittsburgh-zip-codes" style="color: black;">Analyzing Factors Influencing Parcel Prices</a><br>
       &nbsp;&nbsp;&nbsp;- <a href="#methodology" style="color: black;">Methodology</a><br>
       &nbsp;&nbsp;&nbsp;- <a href="#crime-data-analysis" style="color: black;">Crime Data Analysis</a><br>
       &nbsp;&nbsp;&nbsp;- <a href="#school-district-data-analysis" style="color: black;">School District Data Analysis</a><br>
@@ -51,7 +51,7 @@
 
 # Overview
 
-This project explores housing prices in Pittsburgh, with a focus on identifying factors that influence property values, such as property characteristics, neighborhood ratings, and sale year. We use a range of statistical techniques, including linear regression, weighted least squares (WLS), ANOVA, and ANCOVA, to understand trends and relationships in housing prices across different neighborhoods.
+This project explores parcel prices in Pittsburgh, with a focus on identifying factors that influence property values, such as property characteristics, neighborhood ratings, and sale year. We use a range of statistical techniques, including linear regression, weighted least squares (WLS), ANOVA, and ANCOVA, to understand trends and relationships in parcel prices across different neighborhoods.
 
 
 # Data
@@ -95,14 +95,14 @@ This dataset demarcates the zip code boundaries that lie within Allegheny County
 [![View Original Research Paper](https://img.shields.io/badge/School%20District%20Boundries%20Data-0056A0?style=flat&logo=external-link&logoColor=white&color=0056A0)](https://catalog.data.gov/dataset/allegheny-county-school-district-boundaries)
 
 
-Boundaries of school districts in Pittsburgh. School quality plays a significant role in determining the desirability of an area, and this dataset is used to examine how school district rankings impact housing prices.
+Boundaries of school districts in Pittsburgh. School quality plays a significant role in determining the desirability of an area, and this dataset is used to examine how school district rankings impact parcel prices.
 
 ###  Population Data (Manually Compiled)
 
 [![View Dataset](https://img.shields.io/badge/View%20Dataset-0056A0?style=flat&logo=github)](https://github.com/RoryQo/PGH-Neighborhood-Housing-Price-Analysis/blob/main/Data/zipcode_counts.csv)
 
 
-A dataset containing population figures for each ZIP code, used to understand how population density influences housing prices in Pittsburgh. Available in the final zipcounts data set in the data folder of the repo.
+A dataset containing population figures for each ZIP code, used to understand how population density influences parcel prices in Pittsburgh. Available in the final zipcounts data set in the data folder of the repo.
 
 # Regression and ANCOVA
 
@@ -174,9 +174,9 @@ The initial steps involve exploring the data with summary statistics and visuali
 
  ### &nbsp;&nbsp;&nbsp;&nbsp; Naïve Analysis: Price by ZIP Code
 
-In this **purely descriptive analysis**, the average housing prices per ZIP code are computed and visualized using a **bar chart**, with error bars representing the **standard error of the mean (SEM)** to illustrate price variability. However, this approach does **not account for confounding variables** such as property characteristics, neighborhood amenities, or market conditions. While useful for identifying broad trends, it does not provide a comprehensive understanding of the factors influencing housing prices.  
+In this **purely descriptive analysis**, the average parcel prices per ZIP code are computed and visualized using a **bar chart**, with error bars representing the **standard error of the mean (SEM)** to illustrate price variability. However, this approach does **not account for confounding variables** such as property characteristics, neighborhood amenities, or market conditions. While useful for identifying broad trends, it does not provide a comprehensive understanding of the factors influencing parcel prices.  
 
-This research seeks to go beyond this naïve analysis by employing **statistical modeling** to control for key variables and offer a more rigorous, data-driven assessment of housing price determinants.
+This research seeks to go beyond this naïve analysis by employing **statistical modeling** to control for key variables and offer a more rigorous, data-driven assessment of parcel price determinants.
 <p align="center">
   <img src="https://github.com/RoryQo/PGH-Neighborhood-Housing-Price-Analysis/blob/main/Figures/Unadj_Price_zip.jpg?raw=true" width=600px/>
 </p>
@@ -224,7 +224,7 @@ ggplot(...)
 
 
 ### 2. Linear Regression Models
-A series of linear regression models are constructed to predict housing prices based on several independent variables.
+A series of linear regression models are constructed to predict parcel prices based on several independent variables.
 
 #### a. Full Model (Max Model)
 The **max model** includes all potential predictors of house price, such as `LOTAREA`, `STYLE`, `YEARBLT`, `GRADEDESC`, `CONDITION`, and more.
@@ -319,7 +319,7 @@ In regression analysis, it is common to apply a logarithmic transformation to pr
 
 #### High-Leverage & Influential Points
 
-High leverage points can distort regression estimates, reduce accuracy, and violate key assumptions by skewing coefficients, lead to heteroscedasticity, non-normal residuals, and misleading p-values. Removing these points ensures a more robust, reliable, and generalizable model. Using diagnostics like Cook’s Distance, we can identify and exclude them for a more stable and meaningful housing price analysis. From the Residuals vs. Leverage plot, we identified the following influential data points with high Cook’s Distance: 306, 3722, 12370.
+High leverage points can distort regression estimates, reduce accuracy, and violate key assumptions by skewing coefficients, lead to heteroscedasticity, non-normal residuals, and misleading p-values. Removing these points ensures a more robust, reliable, and generalizable model. Using diagnostics like Cook’s Distance, we can identify and exclude them for a more stable and meaningful parcel price analysis. From the Residuals vs. Leverage plot, we identified the following influential data points with high Cook’s Distance: 306, 3722, 12370.
 
 The threshold used for identifying influential observations is:
 
@@ -409,7 +409,7 @@ lm(LOG_PRICE ~ ..., data = df, weights = 1 / sqrt(fitted(model)))
 </p>
 
 ### 5. Box-Cox Transformation
-The **Box-Cox transformation** is applied to the dependent variable (`PRICE`) to identify an optimal transformation (lambda) that improves the model’s normality. The test revealed that the optimal value of ($\lambda$) was **2**. This suggests that applying a square transformation to the data (i.e., `PRICE^2`) would be the most effective. However, to handle the skewness effectively, we applied the **square root transformation** instead, which is a commonly used method for right-skewed data such as housing prices. we compared the square root version to the squared version, and the square root version diagnostic was significantly better than the squared. 
+The **Box-Cox transformation** is applied to the dependent variable (`PRICE`) to identify an optimal transformation (lambda) that improves the model’s normality. The test revealed that the optimal value of ($\lambda$) was **2**. This suggests that applying a square transformation to the data (i.e., `PRICE^2`) would be the most effective. However, to handle the skewness effectively, we applied the **square root transformation** instead, which is a commonly used method for right-skewed data such as parcel prices. we compared the square root version to the squared version, and the square root version diagnostic was significantly better than the squared. 
 
 The general formula for the Box-Cox transformation is as follows:
 
@@ -445,13 +445,13 @@ The general formula for the Box-Cox transformation is as follows:
 
 ### 6. Final Model
 
-Moving forward, we will proceed with both the **Weighted Least Squares (WLS) model** and the **Lambda-transformed model**. While neither approach is perfect, each provides unique strengths in capturing different segments of the housing market. The **Lambda-transformed model** better accounts for **lower-end housing prices**, while the **WLS model** more effectively captures **higher-end housing prices**. By comparing the results of both models and identifying consistent patterns, we can enhance the robustness of our analysis. Interpreting each model through the lens of its strengths allows us to achieve a **more comprehensive and reliable assessment** of housing prices in Pittsburgh.
+Moving forward, we will proceed with both the **Weighted Least Squares (WLS) model** and the **Lambda-transformed model**. While neither approach is perfect, each provides unique strengths in capturing different segments of the parcel market. The **Lambda-transformed model** better accounts for **lower-end parcel prices**, while the **WLS model** more effectively captures **higher-end parcel prices**. By comparing the results of both models and identifying consistent patterns, we can enhance the robustness of our analysis. Interpreting each model through the lens of its strengths allows us to achieve a **more comprehensive and reliable assessment** of parcel prices in Pittsburgh.
 
 
 
 ### 7. Analysis of Variance (ANOVA)
 
-ANCOVA is performed to compare the mean prices of homes across different ZIP codes, adjusting for other variables in the model. The significance of sale year and zip code tells us that there is significant variation in housing prices from these variables, controlling for all other property and land characteristics from our previous models. Moving forward, we will calculate adjusted means for both the transformed model and the wls model, to get a complete picture of Pricing patterns.
+ANCOVA is performed to compare the mean prices of homes across different ZIP codes, adjusting for other variables in the model. The significance of sale year and zip code tells us that there is significant variation in parcel prices from these variables, controlling for all other property and land characteristics from our previous models. Moving forward, we will calculate adjusted means for both the transformed model and the wls model, to get a complete picture of Pricing patterns.
 
 #### ANOVA Table
 
@@ -473,7 +473,7 @@ summary(anova_results)
 
 ### 8. Adjusted Means
 
-Finally, **adjusted means** for the housing prices across ZIP codes are calculated, accounting for nuisance variables like `GRADEDESC`, `SALEDESC.x`, and `HEATINGCOOLING`. These adjusted means are visualized to identify which ZIP codes are the most and least expensive.
+Finally, **adjusted means** for the parcel prices across ZIP codes are calculated, accounting for nuisance variables like `GRADEDESC`, `SALEDESC.x`, and `HEATINGCOOLING`. These adjusted means are visualized to identify which ZIP codes are the most and least expensive.
 
 #### Transformed Power Model
 <p align="center">
@@ -485,7 +485,7 @@ Finally, **adjusted means** for the housing prices across ZIP codes are calculat
   <img src="https://github.com/RoryQo/PGH-Neighborhood-Housing-Price-Analysis/blob/main/Figures/Adju_Price_zip_log.jpg?raw=true" width=600px/>
 </p>
 
-While the adjusted average housing prices across various Pittsburgh ZIP codes show clear trends, it is important to interpret the data with caution:
+While the adjusted average parcel prices across various Pittsburgh ZIP codes show clear trends, it is important to interpret the data with caution:
 
 **Overlapping Confidence Intervals**
 
@@ -513,14 +513,14 @@ adjusted_means_transformed <- emmeans(grid, ~ PROPERTYZIP.x)
   <img src="https://github.com/RoryQo/PGH-Neighborhood-Housing-Price-Analysis/blob/main/Figures/OGtime.jpg?raw=true" width=600px/>
 </p>
 
-The adjusted average housing prices across various Pittsburgh ZIP codes reveal important insights into the housing market dynamics:
+The adjusted average parcel prices across various Pittsburgh ZIP codes reveal important insights into the parcel market dynamics:
 
 **Parallel Trends Across ZIP Codes**
 
-Both the top three highest and lowest ZIP codes in terms of housing prices, including 15232, 15217, 15222 (high-priced areas), and 15204, 15210, 15235 (lower-priced areas), show fairly parallel trends over time. Despite differences in their price levels, all these areas have experienced similar effects from broader market forces such as inflation and fluctuations in the housing market.
+Both the top three highest and lowest ZIP codes in terms of parcel prices, including 15232, 15217, 15222 (high-priced areas), and 15204, 15210, 15235 (lower-priced areas), show fairly parallel trends over time. Despite differences in their price levels, all these areas have experienced similar effects from broader market forces such as inflation and fluctuations in the parcel market.
 Influence of Timing and Inflation:
 
-This suggests that, although the price points differ across neighborhoods, the overall trend of increasing housing prices (with occasional fluctuations) has been a common experience for both high-end and more affordable areas. This trend reflects a generalized market shift rather than isolated changes in individual neighborhoods. Seeing this parallel trend validates our previous adjusted means because regardless of the adjusted mean year held constant, the ranking remains the same.
+This suggests that, although the price points differ across neighborhoods, the overall trend of increasing parcel prices (with occasional fluctuations) has been a common experience for both high-end and more affordable areas. This trend reflects a generalized market shift rather than isolated changes in individual neighborhoods. Seeing this parallel trend validates our previous adjusted means because regardless of the adjusted mean year held constant, the ranking remains the same.
 
 ```
 adjusted_means_transformed <- emmeans(grid, ~ PROPERTYZIP.x * SALEYEAR)
@@ -562,23 +562,23 @@ price_difference = upper_ci_higher_emmean - lower_ci_lower_emmean
 
 ## Conclusion
 
-The estimated price difference between the **most expensive** and **least expensive** ZIP codes in Pittsburgh is **$298,940.92**, with a **confidence interval** ranging from **$170,959.96 to $426,965.34**. This significant disparity highlights the substantial variation in housing prices across different areas.  
+The estimated price difference between the **most expensive** and **least expensive** ZIP codes in Pittsburgh is **$298,940.92**, with a **confidence interval** ranging from **$170,959.96 to $426,965.34**. This significant disparity highlights the substantial variation in parcel prices across different areas.  
 
-The **most expensive ZIP codes** include **15232, 15217, 15222, 15201, and 15213**, indicating neighborhoods with higher market valuations. In contrast, the **least expensive ZIP codes**, such as **15235, 15210, 15204, 15221, and 15214**, reflect areas with lower housing prices. While there is a significant difference between the low house price zip codes and the high house price zip codes, the top 3-5 of each respective group's confidence intervals overlap so much that we can not identify a most or least expensive zip code with confidence.
+The **most expensive ZIP codes** include **15232, 15217, 15222, 15201, and 15213**, indicating neighborhoods with higher market valuations. In contrast, the **least expensive ZIP codes**, such as **15235, 15210, 15204, 15221, and 15214**, reflect areas with lower parcel prices. While there is a significant difference between the low house price zip codes and the high house price zip codes, the top 3-5 of each respective group's confidence intervals overlap so much that we can not identify a most or least expensive zip code with confidence.
 
 This estimated difference **holds all house characteristics constant**, meaning it represents the price change if the **same house** were hypothetically moved from one ZIP code to another. In other words, if you took a house from an inexpensive ZIP code and placed it in an expensive ZIP code, this is the price difference we would expect to see, **purely based on location**.  
 
-Both the highest- and lowest-priced ZIP codes have followed parallel trends over time. This suggests that housing prices across Pittsburgh, regardless of their starting points, have been shaped by overarching market forces rather than isolated neighborhood-specific changes. Furthermore, this parallel trend reinforces the validity of our adjusted mean estimates, as the ranking of ZIP codes remains consistent regardless of the adjustment year.
+Both the highest- and lowest-priced ZIP codes have followed parallel trends over time. This suggests that parcel prices across Pittsburgh, regardless of their starting points, have been shaped by overarching market forces rather than isolated neighborhood-specific changes. Furthermore, this parallel trend reinforces the validity of our adjusted mean estimates, as the ranking of ZIP codes remains consistent regardless of the adjustment year.
 
-While this analysis provides insight into price variation across ZIP codes, it does not yet explain **why** these differences exist. Moving forward, we will analyze **geospatial data** to explore the underlying factors driving these disparities, such as **crime rates and school quality**. Combining **Adjusted Mean Data** (from our above analysis) with geospatial data to allow us to develop a more comprehensive understanding of the forces shaping Pittsburgh’s housing market.
+While this analysis provides insight into price variation across ZIP codes, it does not yet explain **why** these differences exist. Moving forward, we will analyze **geospatial data** to explore the underlying factors driving these disparities, such as **crime rates and school quality**. Combining **Adjusted Mean Data** (from our above analysis) with geospatial data to allow us to develop a more comprehensive understanding of the forces shaping Pittsburgh’s parcel market.
 
 # Geo-Spatial Analysis
 
 
 
-## Analyzing Factors Influencing Housing Prices in Pittsburgh ZIP Codes
+## Analyzing Factors Influencing Parcel Prices in Pittsburgh ZIP Codes
 
-The aim of this analysis is to understand why certain ZIP codes in Pittsburgh have higher housing prices than others by analyzing factors such as **crime rates**, **school district quality**, and other socioeconomic factors. By combining spatial, demographic, and geographic data, this project provides a comprehensive analysis of the key drivers behind property value disparities across Pittsburgh.
+The aim of this analysis is to understand why certain ZIP codes in Pittsburgh have higher parcel prices than others by analyzing factors such as **crime rates**, **school district quality**, and other socioeconomic factors. By combining spatial, demographic, and geographic data, this project provides a comprehensive analysis of the key drivers behind property value disparities across Pittsburgh.
 
 ## Methodology
 
@@ -586,18 +586,18 @@ The aim of this analysis is to understand why certain ZIP codes in Pittsburgh ha
 
 The analysis requires integrating data from various sources with different structures. The key merging steps are:
 
-1. **Merge Housing Prices with ZIP Codes**: Merge the `zipcode_avg_price` dataset (which contains average prices by ZIP code) with the `zips` GeoDataFrame to analyze how prices vary geographically.
+1. **Merge Parcel Prices with ZIP Codes**: Merge the `zipcode_avg_price` dataset (which contains average prices by ZIP code) with the `zips` GeoDataFrame to analyze how prices vary geographically.
 2. **Merge Crime Data**: Perform a spatial join between the **crime data** (arrest incidents) and the **ZIP code boundaries** to calculate **arrest density** in each ZIP code.
 3. **School District Data Integration**: Using fuzzy matching, align the **school district rankings** to the corresponding **ZIP codes**.
 4. **Population Data Merge**: Merge population data with arrest counts to normalize arrest density by population, allowing for a more accurate comparison of crime rates across neighborhoods.
 
-### Visualizing Adjusting Housing Prices Spatially
+### Visualizing Adjusting Parcel Prices Spatially
 
 
 
 #### Steps for Spatial Visualization:
 
-1. **Merge Housing Prices with ZIP Codes**: Merge the `zipcode_avg_price` dataset (from the above eemaean analysis) with the `zips` GeoDataFrame to analyze how prices vary geographically. Be sure to treat the zip code column of each data frame as an integer to ensure a proper merge.
+1. **Merge Parcel Prices with ZIP Codes**: Merge the `zipcode_avg_price` dataset (from the above eemaean analysis) with the `zips` GeoDataFrame to analyze how prices vary geographically. Be sure to treat the zip code column of each data frame as an integer to ensure a proper merge.
 
 ```python
 # Step 3: Merge the GeoDataFrame with the price data (based on ZIP code)
@@ -631,7 +631,7 @@ zipcodes_gdf = zipcodes_gdf.set_crs("EPSG:4326")
    
 2. **Arrest Density Calculation**: The number of arrests in each ZIP code is divided by the population of the ZIP code to calculate **arrest density**—the number of arrests per square meter. High arrest density in a ZIP code typically correlates with lower property values, which is expected based on general urban real estate trends.
 
-3. **Crime Rate and Housing Prices**: Once the arrest density is calculated, it is merged with the **Adjusted Housing price data**. This allows us to explore how areas with higher crime rates (higher arrest density) correlate with lower property values.
+3. **Crime Rate and Parcel Prices**: Once the arrest density is calculated, it is merged with the **Adjusted Parcel price data**. This allows us to explore how areas with higher crime rates (higher arrest density) correlate with lower property values.
 
 ```python
 # Step 5: Perform a spatial join to assign ZIP codes to incident features
@@ -651,12 +651,12 @@ zips_with_incidents = zipcodes_gdf.merge(zipcode_counts, left_on='ZIP', right_on
 
 #### Insights from Crime Data:
 - **Higher crime rates** are generally associated with **lower property prices**.
-- **Crime hotspots** in Pittsburgh, where arrest density is high, show a marked decrease in average housing prices compared to safer neighborhoods.
+- **Crime hotspots** in Pittsburgh, where arrest density is high, show a marked decrease in average parcel prices compared to safer neighborhoods.
 - **Neighborhoods with low crime rates** tend to have higher property values, highlighting the importance of safety as a key factor in homebuying decisions.
 
 ### School District Data Analysis
 
-#### School Districts and Their Influence on Housing Prices
+#### School Districts and Their Influence on Parcel Prices
 
 The quality of local schools is often a significant factor in determining real estate prices, as many homebuyers are willing to pay a premium for access to high-performing school districts. For this project, school district boundaries were mapped using the **GeoJSON file for school districts** in Allegheny County, Pittsburgh.
 
@@ -704,9 +704,9 @@ zip_avg_rank['Inverted Rank'] = max_rank - zip_avg_rank['Rank'] + 1
 
 
 #### Insights from School District Data:
-- **Better-performing school districts** correlate with **higher housing prices**. Homebuyers are often willing to pay more for properties located in areas with highly-ranked schools.
-- **Areas with high-ranked schools** (such as Mt. Lebanon, Fox Chapel, and Pine-Richland) exhibit higher property values, making school district quality a significant factor in the housing price equation.
-- **Neighborhoods with poor-performing schools** tend to have more affordable housing, which might be due to lower demand for homes in those areas.
+- **Better-performing school districts** correlate with **higher parcel prices**. Homebuyers are often willing to pay more for properties located in areas with highly-ranked schools.
+- **Areas with high-ranked schools** (such as Mt. Lebanon, Fox Chapel, and Pine-Richland) exhibit higher property values, making school district quality a significant factor in the parcel price equation.
+- **Neighborhoods with poor-performing schools** tend to have more affordable parcels, which might be due to lower demand for homes in those areas.
 
 ### Geographic Trends:
 - Certain **neighborhoods** in Pittsburgh, even without the best-ranked schools or lowest crime rates, maintain higher property values due to geographic features such as proximity to the city center or desirable scenic views.
