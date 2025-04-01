@@ -646,7 +646,7 @@ zips_with_incidents = zipcodes_gdf.merge(zipcode_counts, left_on='ZIP', right_on
 
 
 <p align="center">
-    <img src="https://github.com/RoryQo/PGH-Neighborhood-Housing-Price-Analysis/blob/main/Figures/HeatMap.jpg" alt="Housing Price Analysis" width=500px />
+    <img src="https://github.com/RoryQo/PGH-Neighborhood-Housing-Price-Analysis/blob/main/Figures/HMC.png" alt="Housing Price Analysis" width=500px />
 </p>
 
 #### Insights from Crime Data:
@@ -714,7 +714,7 @@ zip_avg_rank['Inverted Rank'] = max_rank - zip_avg_rank['Rank'] + 1
 <p align="center">
   <img src="Figures/schoolrank.png" alt="School Rank" width="300px" />
   <img src="Figures/HousepriceG.png" alt="Adjusted Price by ZIP" width="300px" />
-  <img src="Figures/HeatMap.jpg" alt="Housing Price Heatmap" width="300px" />
+  <img src="Figures/HMC.png" alt="Housing Price Heatmap" width="300px" />
 </p>
 
 
