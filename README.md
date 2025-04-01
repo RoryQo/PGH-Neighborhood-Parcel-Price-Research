@@ -646,7 +646,7 @@ zips_with_incidents = zipcodes_gdf.merge(zipcode_counts, left_on='ZIP', right_on
 
 
 <p align="center">
-    <img src="https://github.com/RoryQo/PGH-Neighborhood-Housing-Price-Analysis/blob/main/Figures/Arrest_density.png" alt="Housing Price Analysis" width=500px />
+    <img src="https://github.com/RoryQo/PGH-Neighborhood-Housing-Price-Analysis/blob/main/Figures/HeatMap.jpg" alt="Housing Price Analysis" width=500px />
 </p>
 
 #### Insights from Crime Data:
@@ -710,6 +710,13 @@ zip_avg_rank['Inverted Rank'] = max_rank - zip_avg_rank['Rank'] + 1
 
 ### Geographic Trends:
 - Certain **neighborhoods** in Pittsburgh, even without the best-ranked schools or lowest crime rates, maintain higher property values due to geographic features such as proximity to the city center or desirable scenic views.
+
+<p align="center">
+  <img src="Figures/schoolrank.png" alt="School Rank" width="300px" />
+  <img src="Figures/HousepriceG.png" alt="Adjusted Price by ZIP" width="300px" />
+  <img src="Figures/HeatMap.jpg" alt="Housing Price Heatmap" width="300px" />
+</p>
+
 
 ## Appendix: Simple Alternative Analysis Approach
 
