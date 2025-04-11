@@ -477,7 +477,7 @@ Finally, **adjusted means** for the parcel prices across ZIP codes are calculate
 
 #### Transformed Power Model
 <p align="center">
-  <img src="https://github.com/RoryQo/PGH-Neighborhood-Housing-Price-Analysis/blob/main/Figures/Adj_Price_zip_transformed.jpg?raw=true" width=600px/>
+  <img src="https://github.com/RoryQo/PGH-Neighborhood-Housing-Price-Analysis/blob/main/Figures/Trans_model.jpg?raw=true" width=600px/>
 </p>
 
 #### WLS Model
@@ -508,7 +508,7 @@ adjusted_means_transformed <- emmeans(grid, ~ PROPERTYZIP.x)
 
 ## Viewing Adjusted Mean Trends Through Time
 
-####  WLS Model
+####  Lambda Model
 <p align="center">
   <img src="https://github.com/RoryQo/PGH-Neighborhood-Housing-Price-Analysis/blob/main/Figures/OGtime.jpg?raw=true" width=600px/>
 </p>
