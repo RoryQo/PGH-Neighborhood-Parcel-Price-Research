@@ -51,7 +51,17 @@
 
 # Overview
 
-This project explores parcel prices in Pittsburgh, with a focus on identifying factors that influence property values, such as property characteristics, neighborhood ratings, and sale year. We use a range of statistical techniques, including linear regression, weighted least squares (WLS), ANOVA, and ANCOVA, to understand trends and relationships in parcel prices across different neighborhoods.
+
+This project investigates **parcel price disparities across Pittsburgh neighborhoods**, with a focus on **quantifying and exploring location-based pricing premiums**. Using parcel-level data from Allegheny County, we model how property values vary across ZIP codes after controlling for housing characteristics like size, age, style, and condition.
+
+We employ a series of regression models—including **Ordinary Least Squares (OLS)**, **Weighted Least Squares (WLS)** to address heteroskedasticity, and **Analysis of Covariance (ANCOVA)**—to estimate **adjusted mean parcel prices** for each ZIP code. These adjusted means represent what a typical parcel would cost **if moved from one neighborhood to another**, holding all structural and lot characteristics constant. In this way, they **isolate the value of location itself**, separate from the physical features of the parcel.
+
+To explore the underlying causes of these location-based price differences, we conduct a **geospatial analysis** by merging adjusted price data with:
+- **Arrest density** (as a proxy for crime)
+- **Public school district rankings**
+- **ZIP code-level population data**
+
+This spatial analysis allows us to assess how crime, school quality, and geographic characteristics help explain **why certain neighborhoods have higher or lower parcel prices**, independent of the homes themselves. The combined statistical and spatial framework offers a rigorous approach to disentangling the effects of location on urban property values.
 
 
 # Data
@@ -78,16 +88,16 @@ This dataset includes **property characteristics** such as square footage, numbe
 
 [![View Original Research Paper](https://img.shields.io/badge/Pittsburgh%20Arrest%20Data-0056A0?style=flat&logo=external-link&logoColor=white&color=0056A0)](https://catalog.data.gov/dataset/pittsburgh-police-arrest-data)
 
-Arrest data contains information on people taken into custody by City of Pittsburgh police officers. More serious crimes such as felony offenses are more likely to result in an arrest. However, arrests can occur as a result of other offenses, such as parole violations or a failure to appear for trial. All data is reported at the block/intersection level, with the exception of sex crimes, which are reported at the police zone level.
+Arrest data contains information on people taken into custody by City of Pittsburgh police officers. More serious crimes, such as felony offenses, are more likely to result in an arrest. However, arrests can occur as a result of other offenses, such as parole violations or a failure to appear for trial. All data is reported at the block/intersection level, with the exception of sex crimes, which are reported at the police zone level.
 
-This dataset only contains information reported by City of Pittsburgh Police. It does not contain information about incidents that solely involve other police departments operating within the city (for example, campus police or Port Authority police).
+This dataset only contains information reported by the City of Pittsburgh Police. It does not contain information about incidents that solely involve other police departments operating within the city (for example, campus police or Port Authority police).
 
-### Allgeheny County ZipCode Boundries
+### Allegheny County Zip Code Boundaries
 
 [![View Original Research Paper](https://img.shields.io/badge/Zipcode%20Boundries%20Data-0056A0?style=flat&logo=external-link&logoColor=white&color=0056A0)](https://catalog.data.gov/dataset/allegheny-county-zip-code-boundaries)
 
 
-This dataset demarcates the zip code boundaries that lie within Allegheny County.If viewing this description on the Western Pennsylvania Regional Data Center’s open data portal, this dataset is harvested on a weekly basis from Allegheny County’s GIS data portal
+This dataset demarcates the zip code boundaries that lie within Allegheny County. If viewing this description on the Western Pennsylvania Regional Data Center’s open data portal, this dataset is harvested on a weekly basis from Allegheny County’s GIS data portal
 
 
 ### School District Boundaries
@@ -110,7 +120,7 @@ A dataset containing population figures for each ZIP code, used to understand ho
 
 - **Merge**: Merge both data sets together horizontally on the key of zipcodes, then remove identical columns from the merge
 
-- **Pittsburgh Specific**: Since this is county wide data we filtered it to include only data that is within the Pittsburgh city limits (ie. City== Pittsburgh)
+- **Pittsburgh Specific**: Since this is county-wide data, we filtered it to include only data that is within the Pittsburgh city limits (ie. City== Pittsburgh)
 
 - **Missing Values**: Approximately 20% of the 90,000 observations had missing data. After inspection, these missing values were determined to be random, so they were dropped. We retained enough remaining observations for meaningful analysis.
 
