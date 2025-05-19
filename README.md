@@ -107,7 +107,7 @@ This dataset demarcates the zip code boundaries that lie within Allegheny County
 
 Boundaries of school districts in Pittsburgh. School quality plays a significant role in determining the desirability of an area, and this dataset is used to examine how school district rankings impact parcel prices.
 
-###  Population Data (Manually Compiled)
+###  Population Data (Manually Compiled via US Census Bureau)
 
 [![View Dataset](https://img.shields.io/badge/View%20Dataset-0056A0?style=flat&logo=github)](https://github.com/RoryQo/PGH-Neighborhood-Housing-Price-Analysis/blob/main/Data/zipcode_counts.csv)
 
