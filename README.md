@@ -1,7 +1,11 @@
 <h1 align="center">Pittsburgh Parcel Prices Modeling</h1>
 
+<p align="center">
+  <a href="https://doi.org/10.5281/zenodo.15468351">
+    <img src="https://zenodo.org/badge/DOI/10.5281/zenodo.15468351.svg" alt="DOI">
+  </a>
+</p>
 
-  
 <table align="center">
   <tr>
     <td colspan="2" align="center" style="background-color: white; color: black;"><strong>Table of Contents</strong></td>
